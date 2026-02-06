@@ -1,110 +1,11 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>Nova Chat</title>
-
-  <!-- برای موبایل و آیپد -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    header {
-      background: #1e293b;
-      padding: 15px;
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    #chat {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-    }
-
-    .message {
-      background: #1e293b;
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 8px;
-      max-width: 80%;
-      word-wrap: break-word;
-    }
-
-    footer {
-      display: flex;
-      padding: 10px;
-      background: #020617;
-    }
-
-    input {
-      flex: 1;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: none;
-      outline: none;
-    }
-
-    button {
-      margin-left: 10px;
-      padding: 10px 15px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      background: #38bdf8;
-      color: black;
-    }
-  </style>
+  <title>Nova Test</title>
 </head>
-
-<body>
-
-  <header>🌌 Nova Chat</header>
-
-  <div id="chat"></div>
-
-  <footer>
-    <input id="msgInput" type="text" placeholder="پیامت رو بنویس..." />
-    <button onclick="sendMessage()">ارسال</button>
-  </footer>
-
-  <script>
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("msgInput");
-
-    function sendMessage() {
-      const text = input.value.trim();
-      if (text === "") return;
-
-      const div = document.createElement("div");
-      div.className = "message";
-      div.textContent = "You: " + text;
-
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
-
-      input.value = "";
-    }
-
-    // ارسال با Enter
-    input.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        sendMessage();
-      }
-    });
-  </script>
-
+<body style="font-family:sans-serif;text-align:center;margin-top:100px;">
+  <h1>✅ Nova is Alive</h1>
+  <p>If you see this, GitHub Pages works.</p>
 </body>
 </html>
