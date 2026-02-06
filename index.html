@@ -1,11 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Nova Test</title>
+  <title>Nova Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 280px;
+      background: #020617;
+      padding: 20px;
+    }
+    .sidebar h2 {
+      margin-top: 0;
+      color: #38bdf8;
+    }
+    .chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .input {
+      display: flex;
+      padding: 10px;
+      background: #020617;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+    }
+    button {
+      margin-left: 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background: #38bdf8;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
 </head>
-<body style="font-family:sans-serif;text-align:center;margin-top:100px;">
-  <h1>✅ Nova is Alive</h1>
-  <p>If you see this, GitHub Pages works.</p>
+<body>
+
+  <div class="sidebar">
+    <h2>Nova</h2>
+    <p>Groups</p>
+    <ul>
+      <li>General</li>
+      <li>Friends</li>
+    </ul>
+  </div>
+
+  <div class="chat">
+    <div class="messages" id="messages">
+      <p>👋 Welcome to Nova Chat</p>
+    </div>
+    <div class="input">
+      <input id="msg" placeholder="Type a message...">
+      <button onclick="send()">Send</button>
+    </div>
+  </div>
+
+<script>
+  function send() {
+    const input = document.getElementById('msg');
+    const text = input.value.trim();
+    if (!text) return;
+    const p = document.createElement('p');
+    p.textContent = text;
+    document.getElementById('messages').appendChild(p);
+    input.value = '';
+  }
+</script>
+
 </body>
 </html>
