@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova Chat - Modern Real-time Chat Application</title>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-    <script src="https://unpkg.com/emoji-picker-element"></script>
+    <meta name="theme-color" content="#667eea">
+    <meta name="description" content="آزمون آنلاین ریاضی پایه ششم با 200 سوال">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==">
+    <title>آزمون ریاضی پایه ششم</title>
     <style>
         * {
             margin: 0;
@@ -16,35 +16,29 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            overflow: hidden;
-        }
-
-        .auth-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .auth-card {
+        .container {
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
             width: 100%;
-            max-width: 420px;
             padding: 40px;
-            animation: slideUp 0.4s ease-out;
+            animation: fadeIn 0.5s ease-in;
         }
 
-        @keyframes slideUp {
+        @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -52,1180 +46,716 @@
             }
         }
 
-        .auth-header {
+        h1 {
+            color: #667eea;
             text-align: center;
             margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .auth-title {
-            font-size: 48px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 0 0 10px 0;
+        .section {
+            margin-bottom: 25px;
         }
 
-        .auth-subtitle {
-            color: #666;
-            font-size: 16px;
-            margin: 0;
-        }
-
-        .auth-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .auth-tab {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            background: transparent;
-            font-size: 16px;
-            font-weight: 600;
-            color: #999;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .auth-tab.active {
-            color: #667eea;
-        }
-
-        .auth-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #667eea;
-        }
-
-        .auth-tab:hover {
-            color: #667eea;
-        }
-
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .auth-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .auth-input-group label {
-            font-weight: 600;
+        .section-title {
+            font-size: 1.3em;
             color: #333;
-            font-size: 14px;
-        }
-
-        .auth-input-group input {
-            padding: 14px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
-            font-family: inherit;
-        }
-
-        .auth-input-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .auth-input-group input:disabled {
-            background: #f5f5f5;
-            cursor: not-allowed;
-        }
-
-        .auth-error {
-            background: #fee;
-            color: #c33;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 20px;
-            border: 1px solid #fcc;
-        }
-
-        .auth-submit {
-            padding: 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
-
-        .auth-submit:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .auth-submit:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .chat-container {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .sidebar {
-            width: 320px;
-            background: #2c3e50;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
-            z-index: 1000;
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            background: #34495e;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #445566;
-        }
-
-        .sidebar-header h2 {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .sidebar-toggle {
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-
-        .sidebar-toggle:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .sidebar-section {
-            margin-bottom: 30px;
-        }
-
-        .sidebar-section h3 {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: #ecf0f1;
-        }
-
-        .empty-message {
-            color: #95a5a6;
-            font-size: 14px;
-            font-style: italic;
-        }
-
-        .group-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .group-item {
-            padding: 15px;
-            background: #34495e;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-        }
-
-        .group-item:hover {
-            background: #3d566e;
-            transform: translateX(5px);
-        }
-
-        .group-item.active {
-            background: #667eea;
-            border-color: #764ba2;
-        }
-
-        .group-name {
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .sidebar-button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 15px;
-        }
-
-        .sidebar-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .sidebar-form {
-            background: #34495e;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 10px;
-        }
-
-        .sidebar-input,
-        .sidebar-select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            border: 2px solid #445566;
-            border-radius: 8px;
-            background: #2c3e50;
-            color: white;
-            font-size: 14px;
-            font-family: inherit;
-        }
-
-        .sidebar-input:focus,
-        .sidebar-select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .sidebar-select option {
-            background: #2c3e50;
-            color: white;
-        }
-
-        .sidebar-submit {
-            width: 100%;
-            padding: 12px;
-            background: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .sidebar-submit:hover {
-            background: #229954;
-        }
-
-        .sidebar-footer {
-            padding: 20px;
-            border-top: 1px solid #445566;
-            background: #34495e;
-        }
-
-        .user-info {
-            margin-bottom: 15px;
-        }
-
-        .username {
-            font-weight: 600;
-            color: #ecf0f1;
-            font-size: 16px;
-        }
-
-        .logout-button {
-            width: 100%;
-            padding: 12px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .logout-button:hover {
-            background: #c0392b;
-        }
-
-        .chat-main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #ecf0f1;
-            overflow: hidden;
-        }
-
-        .chat-header {
-            padding: 20px 30px;
-            background: white;
-            border-bottom: 1px solid #ddd;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-
-        .chat-header h2 {
-            font-size: 24px;
-            color: #2c3e50;
-            font-weight: 700;
-        }
-
-        .chat-error {
-            background: #fee;
-            color: #c33;
-            padding: 12px 30px;
-            border-bottom: 1px solid #fcc;
-            font-size: 14px;
-        }
-
-        .messages-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .empty-chat {
+            margin-bottom: 12px;
+            font-weight: bold;
             display: flex;
             align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #95a5a6;
-            font-size: 18px;
         }
 
-        .message {
-            max-width: 70%;
-            padding: 12px 16px;
-            background: white;
-            border-radius: 18px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            animation: messageSlide 0.3s ease-out;
-        }
-
-        @keyframes messageSlide {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .message.own {
-            align-self: flex-end;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .message-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-            font-size: 12px;
-        }
-
-        .message-sender {
-            font-weight: 600;
-            opacity: 0.9;
-        }
-
-        .message-time {
-            opacity: 0.7;
+        .section-title::before {
+            content: "📚";
             margin-left: 10px;
         }
 
-        .message-text {
-            word-wrap: break-word;
-            white-space: pre-wrap;
-            line-height: 1.5;
-            font-size: 15px;
-        }
-
-        .chat-input-container {
-            padding: 20px 30px;
-            background: white;
-            border-top: 1px solid #ddd;
-        }
-
-        .chat-input-form {
+        .options {
             display: flex;
-            align-items: flex-end;
+            flex-wrap: wrap;
             gap: 10px;
-            position: relative;
         }
 
-        .emoji-picker-wrapper {
-            position: relative;
-        }
-
-        .emoji-button {
-            width: 45px;
-            height: 45px;
-            border: none;
-            background: #f8f9fa;
-            border-radius: 50%;
-            font-size: 24px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .emoji-button:hover {
-            background: #e9ecef;
-            transform: scale(1.1);
-        }
-
-        .emoji-picker-container {
-            position: absolute;
-            bottom: 60px;
-            left: 0;
-            z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
+        .option-btn {
+            padding: 12px 24px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
             border-radius: 25px;
-            font-size: 15px;
-            font-family: inherit;
-            resize: none;
-            max-height: 120px;
-            overflow-y: auto;
-            transition: all 0.3s;
-        }
-
-        .chat-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .send-button {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            font-weight: 500;
         }
 
-        .send-button:hover:not(:disabled) {
+        .option-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
 
-        .send-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .no-group-selected {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .option-btn.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .no-group-content {
-            text-align: center;
             color: white;
-            padding: 40px;
+            border-color: #764ba2;
         }
 
-        .no-group-content h2 {
-            font-size: 36px;
+        .show-question-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .show-question-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .show-question-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .question-container {
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-right: 5px solid #667eea;
+        }
+
+        .question-text {
+            font-size: 1.4em;
+            color: #2c3e50;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .question-type-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9em;
             margin-bottom: 15px;
         }
 
-        .no-group-content p {
-            font-size: 18px;
-            opacity: 0.9;
+        .answer-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
         }
 
-        @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                left: 0;
-                top: 0;
-                height: 100vh;
-                transform: translateX(-100%);
-                z-index: 1000;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .chat-main {
-                width: 100%;
-            }
-
-            .message {
-                max-width: 85%;
-            }
-
-            .auth-card {
-                padding: 30px 20px;
-            }
-
-            .auth-title {
-                font-size: 36px;
-            }
+        .answer-input:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
-        @media (max-width: 480px) {
-            .chat-header {
-                padding: 15px 20px;
+        .check-answer-btn {
+            padding: 12px 30px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s;
+        }
+
+        .check-answer-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .next-question-btn {
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .next-question-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+            display: block;
+        }
+
+        .back-btn {
+            padding: 12px 30px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .choice-btn {
+            padding: 15px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            text-align: right;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1em;
+        }
+
+        .choice-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .choice-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
             }
 
-            .messages-container {
-                padding: 15px 20px;
+            h1 {
+                font-size: 1.8em;
             }
 
-            .chat-input-container {
-                padding: 15px 20px;
-            }
-
-            .emoji-picker-container {
-                width: 100vw;
-                left: -20px;
-                right: -20px;
+            .option-btn {
+                font-size: 0.9em;
+                padding: 10px 18px;
             }
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div class="container">
+        <h1>🎓 آزمون ریاضی پایه ششم</h1>
+        
+        <div id="selectionScreen">
+            <div class="section">
+                <div class="section-title">پایه تحصیلی:</div>
+                <div class="options">
+                    <button class="option-btn active" data-option="grade" data-value="6">ششم</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">سختی سوال:</div>
+                <div class="options" id="difficultyOptions">
+                    <button class="option-btn" data-option="difficulty" data-value="خیلی آسان">خیلی آسان</button>
+                    <button class="option-btn" data-option="difficulty" data-value="آسان">آسان</button>
+                    <button class="option-btn" data-option="difficulty" data-value="معمولی">معمولی</button>
+                    <button class="option-btn" data-option="difficulty" data-value="سخت">سخت</button>
+                    <button class="option-btn" data-option="difficulty" data-value="خیلی سخت">خیلی سخت</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">حالت سوال:</div>
+                <div class="options" id="typeOptions">
+                    <button class="option-btn" data-option="type" data-value="تستی">تستی</button>
+                    <button class="option-btn" data-option="type" data-value="جا خالی">جا خالی</button>
+                    <button class="option-btn" data-option="type" data-value="درست/نادرست">درست/نادرست</button>
+                    <button class="option-btn" data-option="type" data-value="تشریحی">تشریحی</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">درس:</div>
+                <div class="options">
+                    <button class="option-btn active" data-option="subject" data-value="ریاضی">ریاضی</button>
+                </div>
+            </div>
+
+            <button class="show-question-btn" onclick="showQuestion()">نمایش سوال 🎯</button>
+        </div>
+
+        <div id="questionScreen" class="question-container">
+            <div class="question-box">
+                <span class="question-type-badge" id="questionTypeBadge"></span>
+                <div class="question-text" id="questionText"></div>
+                
+                <div id="choicesContainer" class="choices" style="display: none;"></div>
+                
+                <div id="answerInputContainer" style="display: none;">
+                    <input type="text" class="answer-input" id="answerInput" placeholder="پاسخ خود را وارد کنید...">
+                </div>
+                
+                <div>
+                    <button class="check-answer-btn" onclick="checkAnswer()">بررسی پاسخ ✓</button>
+                    <button class="next-question-btn" onclick="nextQuestion()">سوال بعدی ←</button>
+                </div>
+                
+                <div class="feedback" id="feedback"></div>
+            </div>
+            
+            <button class="back-btn" onclick="backToSelection()">بازگشت به انتخاب</button>
+        </div>
+    </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const database = firebase.database();
-
-        const emojiPicker = document.createElement('emoji-picker');
-        emojiPicker.style.width = '100%';
-        emojiPicker.style.height = '350px';
-
-        class NovaChat {
-            constructor() {
-                this.currentUser = null;
-                this.selectedGroup = null;
-                this.groups = [];
-                this.myGroups = [];
-                this.messages = [];
-                this.showEmojiPicker = false;
-                this.showCreateGroup = false;
-                this.showJoinGroup = false;
-                this.init();
-            }
-
-            init() {
-                auth.onAuthStateChanged((user) => {
-                    if (user) {
-                        this.currentUser = user;
-                        this.username = user.email.split('@')[0];
-                        this.renderChat();
-                        this.loadGroups();
-                        this.loadMyGroups();
-                    } else {
-                        this.renderAuth();
-                    }
-                });
-            }
-
-            validatePassword(password) {
-                if (password.length <= 5) {
-                    return 'Password must be more than 5 characters';
-                }
-                if (password.includes(' ')) {
-                    return 'Password must not contain spaces';
-                }
-                return null;
-            }
-
-            async signUp(username, password) {
-                if (!username.trim()) {
-                    return 'Username is required';
-                }
-
-                const passwordError = this.validatePassword(password);
-                if (passwordError) {
-                    return passwordError;
-                }
-
-                try {
-                    const email = `${username}@nova.local`;
-                    await auth.createUserWithEmailAndPassword(email, password);
-                    return null;
-                } catch (err) {
-                    if (err.code === 'auth/email-already-in-use') {
-                        return 'Username already exists. Please login instead.';
-                    }
-                    return 'Sign up failed. Please try again.';
-                }
-            }
-
-            async login(username, password) {
-                if (!username.trim()) {
-                    return 'Username is required';
-                }
-
-                if (!password) {
-                    return 'Password is required';
-                }
-
-                try {
-                    const email = `${username}@nova.local`;
-                    await auth.signInWithEmailAndPassword(email, password);
-                    return null;
-                } catch (err) {
-                    if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
-                        return 'Invalid username or password';
-                    }
-                    return 'Login failed. Please try again.';
-                }
-            }
-
-            async logout() {
-                try {
-                    await auth.signOut();
-                } catch (err) {
-                    this.showError('Failed to logout. Please try again.');
-                }
-            }
-
-            loadGroups() {
-                database.ref('groups').on('value', (snapshot) => {
-                    const groupsData = snapshot.val() || {};
-                    this.groups = Object.entries(groupsData).map(([id, data]) => ({
-                        id,
-                        ...data
-                    }));
-                    this.renderChat();
-                });
-            }
-
-            loadMyGroups() {
-                if (!this.username) return;
-
-                database.ref(`users/${this.username}/groups`).on('value', (snapshot) => {
-                    const myGroupsData = snapshot.val() || {};
-                    this.myGroups = Object.keys(myGroupsData);
-                    this.renderChat();
-                });
-            }
-
-            loadMessages(groupId) {
-                if (!groupId) {
-                    this.messages = [];
-                    this.renderChat();
-                    return;
-                }
-
-                database.ref(`groups/${groupId}/messages`).on('value', (snapshot) => {
-                    const messagesData = snapshot.val() || {};
-                    this.messages = Object.entries(messagesData)
-                        .map(([id, data]) => ({
-                            id,
-                            ...data
-                        }))
-                        .sort((a, b) => a.timestamp - b.timestamp);
-                    this.renderChat();
-                    this.scrollToBottom();
-                });
-            }
-
-            scrollToBottom() {
-                setTimeout(() => {
-                    const container = document.querySelector('.messages-container');
-                    if (container) {
-                        container.scrollTop = container.scrollHeight;
-                    }
-                }, 100);
-            }
-
-            async createGroup(name, password) {
-                if (!name.trim()) {
-                    return 'Group name is required';
-                }
-
-                const passwordError = this.validatePassword(password);
-                if (passwordError) {
-                    return passwordError;
-                }
-
-                try {
-                    const groupRef = database.ref('groups').push();
-                    const groupId = groupRef.key;
-
-                    await groupRef.set({
-                        name: name.trim(),
-                        password: password,
-                        creator: this.username,
-                        createdAt: Date.now()
-                    });
-
-                    await database.ref(`users/${this.username}/groups/${groupId}`).set(true);
-
-                    this.selectedGroup = { id: groupId, name: name.trim() };
-                    this.loadMessages(groupId);
-                    this.showCreateGroup = false;
-                    return null;
-                } catch (err) {
-                    return 'Failed to create group. Please try again.';
-                }
-            }
-
-            async joinGroup(groupId, password) {
-                if (!groupId) {
-                    return 'Please select a group';
-                }
-
-                if (!password) {
-                    return 'Password is required';
-                }
-
-                try {
-                    const groupSnapshot = await database.ref(`groups/${groupId}`).once('value');
-                    
-                    if (!groupSnapshot.exists()) {
-                        return 'Group not found';
-                    }
-
-                    const groupData = groupSnapshot.val();
-                    
-                    if (groupData.password !== password) {
-                        return 'Incorrect password';
-                    }
-
-                    await database.ref(`users/${this.username}/groups/${groupId}`).set(true);
-                    
-                    this.selectedGroup = { id: groupId, name: groupData.name };
-                    this.loadMessages(groupId);
-                    this.showJoinGroup = false;
-                    return null;
-                } catch (err) {
-                    return 'Failed to join group. Please try again.';
-                }
-            }
-
-            async sendMessage(text) {
-                if (!text.trim() || !this.selectedGroup) return;
-
-                try {
-                    await database.ref(`groups/${this.selectedGroup.id}/messages`).push({
-                        text: text.trim(),
-                        sender: this.username,
-                        timestamp: Date.now()
-                    });
-                } catch (err) {
-                    this.showError('Failed to send message. Please try again.');
-                }
-            }
-
-            formatTime(timestamp) {
-                const date = new Date(timestamp);
-                const hours = date.getHours().toString().padStart(2, '0');
-                const minutes = date.getMinutes().toString().padStart(2, '0');
-                return `${hours}:${minutes}`;
-            }
-
-            showError(message) {
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'chat-error';
-                errorDiv.textContent = message;
-                const chatMain = document.querySelector('.chat-main');
-                if (chatMain) {
-                    chatMain.insertBefore(errorDiv, chatMain.firstChild);
-                    setTimeout(() => errorDiv.remove(), 5000);
-                }
-            }
-
-            renderAuth() {
-                let isLogin = true;
-                let username = '';
-                let password = '';
-                let error = '';
-                let loading = false;
-
-                const render = () => {
-                    document.getElementById('root').innerHTML = `
-                        <div class="auth-container">
-                            <div class="auth-card">
-                                <div class="auth-header">
-                                    <h1 class="auth-title">Nova</h1>
-                                    <p class="auth-subtitle">Modern Real-time Chat</p>
-                                </div>
-                                <div class="auth-tabs">
-                                    <button class="auth-tab ${isLogin ? 'active' : ''}" id="loginTab">Login</button>
-                                    <button class="auth-tab ${!isLogin ? 'active' : ''}" id="signupTab">Sign Up</button>
-                                </div>
-                                ${error ? `<div class="auth-error">${error}</div>` : ''}
-                                <form class="auth-form" id="authForm">
-                                    <div class="auth-input-group">
-                                        <label for="username">Username</label>
-                                        <input id="username" type="text" value="${username}" placeholder="Enter your username" ${loading ? 'disabled' : ''} />
-                                    </div>
-                                    <div class="auth-input-group">
-                                        <label for="password">Password</label>
-                                        <input id="password" type="password" value="${password}" placeholder="${isLogin ? 'Enter your password' : 'More than 5 characters, no spaces'}" ${loading ? 'disabled' : ''} />
-                                    </div>
-                                    <button type="submit" class="auth-submit" ${loading ? 'disabled' : ''}>
-                                        ${loading ? 'Please wait...' : (isLogin ? 'Login' : 'Sign Up')}
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    `;
-
-                    document.getElementById('loginTab').onclick = () => {
-                        isLogin = true;
-                        error = '';
-                        password = '';
-                        render();
-                    };
-
-                    document.getElementById('signupTab').onclick = () => {
-                        isLogin = false;
-                        error = '';
-                        password = '';
-                        render();
-                    };
-
-                    document.getElementById('authForm').onsubmit = async (e) => {
-                        e.preventDefault();
-                        loading = true;
-                        error = '';
-                        username = document.getElementById('username').value;
-                        password = document.getElementById('password').value;
-                        render();
-
-                        const result = isLogin 
-                            ? await this.login(username, password)
-                            : await this.signUp(username, password);
-
-                        loading = false;
-                        if (result) {
-                            error = result;
-                        }
-                        render();
-                    };
-
-                    document.getElementById('username').oninput = (e) => {
-                        username = e.target.value;
-                        error = '';
-                        render();
-                    };
-
-                    document.getElementById('password').oninput = (e) => {
-                        password = e.target.value;
-                        error = '';
-                        render();
-                    };
-                };
-
-                render();
-            }
-
-            renderChat() {
-                const sidebarOpen = window.innerWidth > 768;
-                let newGroupName = '';
-                let newGroupPassword = '';
-                let joinGroupId = '';
-                let joinGroupPassword = '';
-                let messageText = '';
-                let sidebarVisible = sidebarOpen;
-
-                const render = () => {
-                    const selectedGroupData = this.groups.find(g => g.id === this.selectedGroup?.id);
-                    const myGroupsList = this.myGroups.map(groupId => {
-                        const group = this.groups.find(g => g.id === groupId);
-                        return group ? `<div class="group-item ${this.selectedGroup?.id === groupId ? 'active' : ''}" data-group-id="${group.id}">${group.name}</div>` : '';
-                    }).join('');
-
-                    document.getElementById('root').innerHTML = `
-                        <div class="chat-container">
-                            <div class="sidebar ${sidebarVisible ? 'open' : ''}">
-                                <div class="sidebar-header">
-                                    <h2>Nova Chat</h2>
-                                    <button class="sidebar-toggle" id="sidebarToggle">${sidebarVisible ? '←' : '→'}</button>
-                                </div>
-                                <div class="sidebar-content">
-                                    <div class="sidebar-section">
-                                        <h3>My Groups</h3>
-                                        ${this.myGroups.length === 0 
-                                            ? '<p class="empty-message">You haven\'t joined any groups yet.</p>'
-                                            : `<div class="group-list">${myGroupsList}</div>`
-                                        }
-                                    </div>
-                                    <div class="sidebar-section">
-                                        <button class="sidebar-button" id="joinGroupBtn">Join Group</button>
-                                        ${this.showJoinGroup ? `
-                                            <div class="sidebar-form">
-                                                <select id="joinGroupSelect" class="sidebar-select">
-                                                    <option value="">Select a group</option>
-                                                    ${this.groups.map(g => `<option value="${g.id}">${g.name}</option>`).join('')}
-                                                </select>
-                                                <form id="joinGroupForm">
-                                                    <input type="password" id="joinPassword" class="sidebar-input" placeholder="Group password" />
-                                                    <button type="submit" class="sidebar-submit">Join</button>
-                                                </form>
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                    <div class="sidebar-section">
-                                        <button class="sidebar-button" id="createGroupBtn">Create Group</button>
-                                        ${this.showCreateGroup ? `
-                                            <form id="createGroupForm" class="sidebar-form">
-                                                <input type="text" id="newGroupName" class="sidebar-input" placeholder="Group name" />
-                                                <input type="password" id="newGroupPassword" class="sidebar-input" placeholder="Password (more than 5 chars, no spaces)" />
-                                                <button type="submit" class="sidebar-submit">Create</button>
-                                            </form>
-                                        ` : ''}
-                                    </div>
-                                    <div class="sidebar-footer">
-                                        <div class="user-info">
-                                            <span class="username">${this.username}</span>
-                                        </div>
-                                        <button class="logout-button" id="logoutBtn">Logout</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="chat-main">
-                                ${this.selectedGroup ? `
-                                    <div class="chat-header">
-                                        <h2>${this.selectedGroup.name}</h2>
-                                    </div>
-                                    <div class="messages-container" id="messagesContainer">
-                                        ${this.messages.length === 0 
-                                            ? '<div class="empty-chat"><p>No messages yet. Start the conversation!</p></div>'
-                                            : this.messages.map(msg => `
-                                                <div class="message ${msg.sender === this.username ? 'own' : ''}">
-                                                    <div class="message-header">
-                                                        <span class="message-sender">${msg.sender}</span>
-                                                        <span class="message-time">${this.formatTime(msg.timestamp)}</span>
-                                                    </div>
-                                                    <div class="message-text">${msg.text.replace(/\n/g, '<br>')}</div>
-                                                </div>
-                                            `).join('')
-                                        }
-                                    </div>
-                                    <div class="chat-input-container">
-                                        <form class="chat-input-form" id="messageForm">
-                                            <div class="emoji-picker-wrapper">
-                                                <button type="button" class="emoji-button" id="emojiBtn">😊</button>
-                                                ${this.showEmojiPicker ? `
-                                                    <div class="emoji-picker-container" id="emojiPickerContainer"></div>
-                                                ` : ''}
-                                            </div>
-                                            <textarea id="messageInput" class="chat-input" placeholder="Type a message... (Enter to send, Shift+Enter for new line)" rows="1">${messageText}</textarea>
-                                            <button type="submit" class="send-button" ${!messageText.trim() ? 'disabled' : ''}>Send</button>
-                                        </form>
-                                    </div>
-                                ` : `
-                                    <div class="no-group-selected">
-                                        <div class="no-group-content">
-                                            <h2>Welcome to Nova Chat!</h2>
-                                            <p>Select a group from the sidebar or create a new one to start chatting.</p>
-                                        </div>
-                                    </div>
-                                `}
-                            </div>
-                        </div>
-                    `;
-
-                    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-                        sidebarVisible = !sidebarVisible;
-                        render();
-                    });
-
-                    document.querySelectorAll('.group-item').forEach(item => {
-                        item.addEventListener('click', () => {
-                            const groupId = item.dataset.groupId;
-                            const group = this.groups.find(g => g.id === groupId);
-                            if (group) {
-                                this.selectedGroup = { id: groupId, name: group.name };
-                                this.loadMessages(groupId);
-                            }
-                        });
-                    });
-
-                    document.getElementById('joinGroupBtn')?.addEventListener('click', () => {
-                        this.showJoinGroup = !this.showJoinGroup;
-                        this.showCreateGroup = false;
-                        render();
-                    });
-
-                    document.getElementById('createGroupBtn')?.addEventListener('click', () => {
-                        this.showCreateGroup = !this.showCreateGroup;
-                        this.showJoinGroup = false;
-                        render();
-                    });
-
-                    document.getElementById('joinGroupForm')?.addEventListener('submit', async (e) => {
-                        e.preventDefault();
-                        joinGroupId = document.getElementById('joinGroupSelect').value;
-                        joinGroupPassword = document.getElementById('joinPassword').value;
-                        const error = await this.joinGroup(joinGroupId, joinGroupPassword);
-                        if (error) {
-                            this.showError(error);
-                        } else {
-                            joinGroupPassword = '';
-                            joinGroupId = '';
-                            render();
-                        }
-                    });
-
-                    document.getElementById('createGroupForm')?.addEventListener('submit', async (e) => {
-                        e.preventDefault();
-                        newGroupName = document.getElementById('newGroupName').value;
-                        newGroupPassword = document.getElementById('newGroupPassword').value;
-                        const error = await this.createGroup(newGroupName, newGroupPassword);
-                        if (error) {
-                            this.showError(error);
-                        } else {
-                            newGroupName = '';
-                            newGroupPassword = '';
-                            render();
-                        }
-                    });
-
-                    document.getElementById('logoutBtn')?.addEventListener('click', () => {
-                        this.logout();
-                    });
-
-                    const emojiBtn = document.getElementById('emojiBtn');
-                    const emojiPickerContainer = document.getElementById('emojiPickerContainer');
-                    
-                    if (emojiBtn) {
-                        emojiBtn.addEventListener('click', () => {
-                            this.showEmojiPicker = !this.showEmojiPicker;
-                            render();
-                        });
-                    }
-
-                    if (this.showEmojiPicker && emojiPickerContainer) {
-                        const picker = emojiPicker.cloneNode(true);
-                        picker.addEventListener('emoji-click', (e) => {
-                            const emoji = e.detail.unicode;
-                            const input = document.getElementById('messageInput');
-                            if (input) {
-                                const cursorPos = input.selectionStart || 0;
-                                messageText = messageText.substring(0, cursorPos) + emoji + messageText.substring(cursorPos);
-                                this.showEmojiPicker = false;
-                                render();
-                                setTimeout(() => {
-                                    input.focus();
-                                    input.setSelectionRange(cursorPos + emoji.length, cursorPos + emoji.length);
-                                }, 0);
-                            }
-                        });
-                        emojiPickerContainer.appendChild(picker);
-                    }
-
-                    const messageInput = document.getElementById('messageInput');
-                    if (messageInput) {
-                        messageInput.addEventListener('input', (e) => {
-                            messageText = e.target.value;
-                            e.target.style.height = 'auto';
-                            e.target.style.height = e.target.scrollHeight + 'px';
-                            const sendBtn = document.querySelector('.send-button');
-                            if (sendBtn) {
-                                sendBtn.disabled = !messageText.trim();
-                            }
-                        });
-
-                        messageInput.addEventListener('keypress', (e) => { 
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault();
-                                document.getElementById('messageForm').dispatchEvent(new Event('submit'));
-                            }
-                        });
-                    }
-
-                    document.getElementById('messageForm')?.addEventListener('submit', async (e) => {
-                        e.preventDefault();
-                        if (messageText.trim()) {
-                            await this.sendMessage(messageText);
-                            messageText = '';
-                            this.showEmojiPicker = false; 
-                            render();
-                        }
-                    });
-
-                    document.addEventListener('click', (e) => {
-                        if (this.showEmojiPicker && !e.target.closest('.emoji-picker-wrapper')) {
-                            this.showEmojiPicker = false;
-                            render();
-                        }
-                    });
-                };
-
-                render();
-            }
+        // Register Service Worker for offline support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed'));
+            });
         }
 
-        const app = new NovaChat();
+        const questions = [
+            // خیلی آسان - تستی
+            {id: 1, difficulty: "خیلی آسان", type: "تستی", text: "عددی که فقط یک شمارنده دارد کدام است؟", choices: ["0", "1", "2", "هیچ‌کدام"], answer: "1"},
+            {id: 2, difficulty: "خیلی آسان", type: "تستی", text: "کدام عدد بر تمام اعداد یک‌رقمی (۱ تا ۹) بخش‌پذیر است؟", choices: ["1260", "2520", "5040", "هر دو گزینه ۲ و ۳"], answer: "2520"},
+            {id: 3, difficulty: "خیلی آسان", type: "تستی", text: "حاصل عبارت ۰.۵ × ۰.۲ ÷ ۰.۱ چند است؟", choices: ["0.1", "1", "10", "0.01"], answer: "1"},
+            {id: 4, difficulty: "خیلی آسان", type: "تستی", text: "مجموع دو عدد اول برابر ۲۱ است. حاصل‌ضرب آن‌ها کدام است؟", choices: ["38", "54", "110", "چنین عددی وجود ندارد"], answer: "38"},
+            {id: 5, difficulty: "خیلی آسان", type: "تستی", text: "مجموع زوایای داخلی یک مثلث که یکی از زوایای آن ۹۰.۵ درجه باشد چند است؟", choices: ["180", "181", "179", "90"], answer: "180"},
+            {id: 6, difficulty: "خیلی آسان", type: "تستی", text: "کسر معکوسِ معکوسِ کسر ۳/۴ کدام است؟", choices: ["4/3", "3/4", "1", "1.5"], answer: "3/4"},
+            {id: 7, difficulty: "خیلی آسان", type: "تستی", text: "ربعِ ثلثِ عدد ۷۲ چند می‌شود؟", choices: ["4", "6", "8", "12"], answer: "6"},
+            {id: 8, difficulty: "خیلی آسان", type: "تستی", text: "واحد اصلی اندازه‌گیری مساحت در سیستم بین‌المللی کدام است؟", choices: ["متر", "متر مربع", "دسی‌متر", "هکتار"], answer: "متر مربع"},
+            {id: 9, difficulty: "خیلی آسان", type: "تستی", text: "در الگوی ۱، ۳، ۷، ۱۵، ... عدد بعدی کدام است؟", choices: ["21", "25", "31", "33"], answer: "31"},
+            {id: 10, difficulty: "خیلی آسان", type: "تستی", text: "کدام کسر به عدد ۱ نزدیک‌تر است؟", choices: ["9/10", "10/11", "11/12", "100/101"], answer: "100/101"},
+
+            // خیلی آسان - درست/نادرست
+            {id: 11, difficulty: "خیلی آسان", type: "درست/نادرست", text: "عدد صفر تنها عددی است که قرینه‌اش با خودش برابر است.", answer: "درست"},
+            {id: 12, difficulty: "خیلی آسان", type: "درست/نادرست", text: "حاصل‌جمع سه عدد فرد متوالی، همیشه عددی فرد است.", answer: "درست"},
+            {id: 13, difficulty: "خیلی آسان", type: "درست/نادرست", text: "هر مثلث متساوی‌الساقین، حتماً یک زاویه منفرجه دارد.", answer: "نادرست"},
+            {id: 14, difficulty: "خیلی آسان", type: "درست/نادرست", text: "کسر ۳/۷ بزرگتر از کسر ۴/۹ است.", answer: "نادرست"},
+            {id: 15, difficulty: "خیلی آسان", type: "درست/نادرست", text: "عدد ۹۱ یک عدد مرکب است.", answer: "درست"},
+            {id: 16, difficulty: "خیلی آسان", type: "درست/نادرست", text: "مساحت مربع برابر است با مجذورِ طولِ ضلع آن.", answer: "درست"},
+            {id: 17, difficulty: "خیلی آسان", type: "درست/نادرست", text: "تنها عدد زوجی که اول نیست، عدد ۲ است.", answer: "نادرست"},
+            {id: 18, difficulty: "خیلی آسان", type: "درست/نادرست", text: "در عدد ۱۲.۳۴۵، ارزش مکانی رقم ۴، صدم است.", answer: "درست"},
+            {id: 19, difficulty: "خیلی آسان", type: "درست/نادرست", text: "نیم‌خط از هر دو طرف باز است.", answer: "نادرست"},
+            {id: 20, difficulty: "خیلی آسان", type: "درست/نادرست", text: "حاصل تقسیم صفر بر هر عدد غیر صفر، برابر صفر است.", answer: "درست"},
+
+            // خیلی آسان - جا خالی
+            {id: 21, difficulty: "خیلی آسان", type: "جا خالی", text: "معکوسِ عدد مخلوط ۲ و ۱/۳ برابر با کسر ....... است.", answer: "3/7"},
+            {id: 22, difficulty: "خیلی آسان", type: "جا خالی", text: "عدد ۱۱۱ بر عدد ....... بخش‌پذیر است (مجموع ارقام ۳ است).", answer: "3"},
+            {id: 23, difficulty: "خیلی آسان", type: "جا خالی", text: "مساحت مستطیلی به محیط ۱۶ و طول ۵ برابر با ....... است.", answer: "15"},
+            {id: 24, difficulty: "خیلی آسان", type: "جا خالی", text: "خمسِ خمسِ یک عدد یعنی کسر ....... آن عدد.", answer: "1/25"},
+            {id: 25, difficulty: "خیلی آسان", type: "جا خالی", text: "عددی که بر ۲ و ۳ بخش‌پذیر باشد، حتماً بر ....... هم بخش‌پذیر است.", answer: "6"},
+            {id: 26, difficulty: "خیلی آسان", type: "جا خالی", text: "کوچک‌ترین عدد سه رقمی بدون تکرار ارقام ....... است.", answer: "102"},
+            {id: 27, difficulty: "خیلی آسان", type: "جا خالی", text: "هر لیتر برابر با ....... سانتی‌متر مکعب است.", answer: "1000"},
+            {id: 28, difficulty: "خیلی آسان", type: "جا خالی", text: "در کسر A/B، اگر A > B باشد، کسر از واحد ....... است.", answer: "بزرگتر"},
+            {id: 29, difficulty: "خیلی آسان", type: "جا خالی", text: "متممِ متممِ یک زاویه ۴۰ درجه، برابر با ....... درجه است.", answer: "40"},
+            {id: 30, difficulty: "خیلی آسان", type: "جا خالی", text: "محیط دایره برابر است با دو برابرِ شعاع ضربدر ....... .", answer: "عدد پی"},
+
+            // خیلی آسان - تشریحی
+            {id: 31, difficulty: "خیلی آسان", type: "تشریحی", text: "عدد ۷۲ را به صورت ضرب چهار عدد اول بنویس.", answer: "2×2×2×3×3"},
+            {id: 32, difficulty: "خیلی آسان", type: "تشریحی", text: "حاصل ۱ و ۱/۲ + ۲ و ۱/۴ را به صورت کسر بنویس.", answer: "15/4"},
+            {id: 33, difficulty: "خیلی آسان", type: "تشریحی", text: "محیط مثلثی را حساب کن که اضلاع آن متوالی و کوچکترین ضلعش ۵ باشد.", answer: "18"},
+            {id: 34, difficulty: "خیلی آسان", type: "تشریحی", text: "عدد «ده میلیون و ده هزار و ده» را به رقم بنویس.", answer: "10010010"},
+            {id: 35, difficulty: "خیلی آسان", type: "تشریحی", text: "تمام اعداد اول بین ۳۰ تا ۵۰ را بنویس.", answer: "31، 37، 41، 43، 47"},
+            {id: 36, difficulty: "خیلی آسان", type: "تشریحی", text: "حاصل ۰.۲۵ × ۴۰ را ذهنی حساب کن و راه حل را بنویس.", answer: "10"},
+            {id: 37, difficulty: "خیلی آسان", type: "تشریحی", text: "یک ذوزنقه قائم‌الزاویه رسم کن و زوایای قائمه آن را نشان بده.", answer: "رسم"},
+            {id: 38, difficulty: "خیلی آسان", type: "تشریحی", text: "کسر ۱۲/۱۸ و ۲۰/۳۰ را با هم مقایسه کن.", answer: "مساوی"},
+            {id: 39, difficulty: "خیلی آسان", type: "تشریحی", text: "یک مکعب چند یال (لبه) دارد؟", answer: "12"},
+            {id: 40, difficulty: "خیلی آسان", type: "تشریحی", text: "حاصل ۱۳.۷ - ۴.۸۵ را دقیق حساب کن.", answer: "8.85"},
+
+            // آسان - تستی
+            {id: 41, difficulty: "آسان", type: "تستی", text: "حاصل ۵/۶ - ۱/۴ کدام است؟", choices: ["4/2", "7/12", "6/10", "1/2"], answer: "7/12"},
+            {id: 42, difficulty: "آسان", type: "تستی", text: "کدام عدد بر ۱۲ بخش‌پذیر است؟", choices: ["124", "236", "348", "460"], answer: "348"},
+            {id: 43, difficulty: "آسان", type: "تستی", text: "مساحت مربعی به قطر ۴ سانتی‌متر چقدر است؟", choices: ["4", "8", "16", "32"], answer: "8"},
+            {id: 44, difficulty: "آسان", type: "تستی", text: "مجموع اعداد صحیح بین ۵- و ۲+ چند است؟", choices: ["-9", "-10", "-14", "-12"], answer: "-9"},
+            {id: 45, difficulty: "آسان", type: "تستی", text: "نسبت ۳ به ۸ مساوی است با نسبت ....... به ۲۰؟", choices: ["6", "7.5", "8", "10"], answer: "7.5"},
+            {id: 46, difficulty: "آسان", type: "تستی", text: "مکمل متمم زاویه ۷۰ درجه چند درجه است؟", choices: ["20", "70", "110", "160"], answer: "160"},
+            {id: 47, difficulty: "آسان", type: "تستی", text: "عدد ۱۰۰ چند شمارنده اول متفاوت دارد؟", choices: ["1", "2", "3", "4"], answer: "2"},
+            {id: 48, difficulty: "آسان", type: "تستی", text: "کدام کسر دقیقاً وسط ۱/۴ و ۱/۲ قرار دارد؟", choices: ["1/3", "3/8", "2/6", "5/8"], answer: "3/8"},
+            {id: 49, difficulty: "آسان", type: "تستی", text: "مقدار x در معادله ۲x - ۴ = ۱۰ چند است؟", choices: ["3", "5", "7", "8"], answer: "7"},
+            {id: 50, difficulty: "آسان", type: "تستی", text: "در عدد پلاک یک خانه، اگر ارزش مکانی دهگان ۵ باشد، آن رقم چیست؟", choices: ["5", "50", "500", "10"], answer: "5"},
+
+            // آسان - درست/نادرست
+            {id: 51, difficulty: "آسان", type: "درست/نادرست", text: "حاصل‌ضرب هر دو عدد اول، عددی مرکب است.", answer: "درست"},
+            {id: 52, difficulty: "آسان", type: "درست/نادرست", text: "قرینه عدد (۳-) نسبت به عدد ۱+ برابر با ۵+ است.", answer: "درست"},
+            {id: 53, difficulty: "آسان", type: "درست/نادرست", text: "مجموع زوایای خارجی هر مثلث ۳۶۰ درجه است.", answer: "درست"},
+            {id: 54, difficulty: "آسان", type: "درست/نادرست", text: "کسر ۱۱/۹ یک کسر بزرگتر از واحد است.", answer: "درست"},
+            {id: 55, difficulty: "آسان", type: "درست/نادرست", text: "عدد ۳۳۳ هم بر ۳ و هم بر ۹ بخش‌پذیر است.", answer: "درست"},
+            {id: 56, difficulty: "آسان", type: "درست/نادرست", text: "در تقسیم، باقی‌مانده می‌تواند مساوی مقسوم‌علیه باشد.", answer: "نادرست"},
+            {id: 57, difficulty: "آسان", type: "درست/نادرست", text: "هر لوزی که قطرهایش برابر باشد، مربع است.", answer: "درست"},
+            {id: 58, difficulty: "آسان", type: "درست/نادرست", text: "معکوسِ معکوس هر عدد با خود آن عدد برابر است.", answer: "درست"},
+            {id: 59, difficulty: "آسان", type: "درست/نادرست", text: "عدد ۰.۰۸ از ۰.۷ کوچکتر است.", answer: "درست"},
+            {id: 60, difficulty: "آسان", type: "درست/نادرست", text: "کوچکترین عدد مرکب دو رقمی، عدد ۱۲ است.", answer: "درست"},
+
+            // آسان - جا خالی
+            {id: 61, difficulty: "آسان", type: "جا خالی", text: "حاصل عبارت (-۱۵) + (+۲۰) - (-۵) برابر است با ....... .", answer: "10"},
+            {id: 62, difficulty: "آسان", type: "جا خالی", text: "مساحت لوزی برابر است با حاصل‌ضرب دو قطر تقسیم بر ....... .", answer: "2"},
+            {id: 63, difficulty: "آسان", type: "جا خالی", text: "در الگوی ۲، ۵، ۱۰، ۱۷، ... جمله بعدی ....... است.", answer: "26"},
+            {id: 64, difficulty: "آسان", type: "جا خالی", text: "حاصل‌ضرب ۱.۲ × ۰.۵ برابر است با ....... .", answer: "0.6"},
+            {id: 65, difficulty: "آسان", type: "جا خالی", text: "عدد ....... تنها عدد اولی است که رقم یکانش ۵ است.", answer: "5"},
+            {id: 66, difficulty: "آسان", type: "جا خالی", text: "نسبت پول علی به رضا ۲ به ۳ است؛ یعنی علی ....... درصد پول رضا را دارد.", answer: "66.6"},
+            {id: 67, difficulty: "آسان", type: "جا خالی", text: "مجموع زوایای داخلی یک شش‌ضلعی محدب ....... درجه است.", answer: "720"},
+            {id: 68, difficulty: "آسان", type: "جا خالی", text: "نسبت محیط دایره به قطر آن عدد ....... است.", answer: "عدد پی"},
+            {id: 69, difficulty: "آسان", type: "جا خالی", text: "کوچک‌ترین مخرج مشترک برای دو کسر با مخرج‌های ۶ و ۹ عدد ....... است.", answer: "18"},
+            {id: 70, difficulty: "آسان", type: "جا خالی", text: "برای تبدیل سانتی‌متر به متر، عدد را بر ....... تقسیم می‌کنیم.", answer: "100"},
+
+            // آسان - تشریحی
+            {id: 71, difficulty: "آسان", type: "تشریحی", text: "اعداد از ۴- تا ۳+ را روی محور نمایش بده و میانگین آن‌ها را پیدا کن.", answer: "-0.5"},
+            {id: 72, difficulty: "آسان", type: "تشریحی", text: "مساحت دایره‌ای به قطر ۱۰ سانتی‌متر را حساب کن. (π = ۳.۱۴)", answer: "78.5"},
+            {id: 73, difficulty: "آسان", type: "تشریحی", text: "حاصل ۲ و ۱/۳ ÷ ۷/۹ را به دست آور و ساده کن.", answer: "3"},
+            {id: 74, difficulty: "آسان", type: "تشریحی", text: "کالایی ۲۰٪ تخفیف دارد. اگر قیمت اولیه ۵۰ هزار تومان باشد، قیمت نهایی چقدر است؟", answer: "40000"},
+            {id: 75, difficulty: "آسان", type: "تشریحی", text: "میانگین نمرات علی (۱۵، ۱۷، ۱۸، ۲۰) را حساب کن.", answer: "17.5"},
+            {id: 76, difficulty: "آسان", type: "تشریحی", text: "عدد ۸۴ را به روش درختی به عوامل اول تجزیه کن.", answer: "2×2×3×7"},
+            {id: 77, difficulty: "آسان", type: "تشریحی", text: "اگر محیط مستطیلی ۲۴ و طولش ۲ برابر عرضش باشد، مساحت را بیاب.", answer: "32"},
+            {id: 78, difficulty: "آسان", type: "تشریحی", text: "سه کسر بنویس که بین ۲/۵ و ۳/۵ باشند.", answer: "4/10، 5/10، 6/10"},
+            {id: 79, difficulty: "آسان", type: "تشریحی", text: "قرینه نقطه [۲, -۴] نسبت به محور عرض‌ها کدام است؟", answer: "[-2, -4]"},
+            {id: 80, difficulty: "آسان", type: "تشریحی", text: "حاصل ۰.۳۶ ÷ ۰.۰۶ را به دست آور.", answer: "6"},
+
+            // معمولی - تستی
+            {id: 81, difficulty: "معمولی", type: "تستی", text: "حاصل ۵/۸ ÷ ۱۵/۱۶ چند است؟", choices: ["2/3", "3/2", "1/2", "2"], answer: "2/3"},
+            {id: 82, difficulty: "معمولی", type: "تستی", text: "دمای هوا ۱۲- درجه است. اگر ابتدا ۴ درجه سردتر و سپس ۱۰ درجه گرمتر شود، دمای فعلی چند است؟", choices: ["-6", "-2", "-18", "+4"], answer: "-6"},
+            {id: 83, difficulty: "معمولی", type: "تستی", text: "ب.م.م دو عدد ۱۲ و ک.م.م آن‌ها ۷۲ است. اگر یکی از اعداد ۲۴ باشد، دیگری کدام است؟", choices: ["12", "36", "48", "72"], answer: "36"},
+            {id: 84, difficulty: "معمولی", type: "تستی", text: "نسبت مساحت مربعی به ضلع ۴ به محیط آن چقدر است؟", choices: ["1 به 1", "4 به 1", "1 به 4", "16 به 1"], answer: "1 به 1"},
+            {id: 85, difficulty: "معمولی", type: "تستی", text: "حاصل ۳ و ۱/۴ - ۱ و ۵/۸ کدام است؟", choices: ["1 و 5/8", "2 و 1/8", "1 و 3/8", "2 و 3/8"], answer: "1 و 5/8"},
+            {id: 86, difficulty: "معمولی", type: "تستی", text: "کدام عدد بین کسر ۲/۳ و ۳/۴ قرار ندارد؟", choices: ["0.7", "7/10", "0.6", "0.72"], answer: "0.6"},
+            {id: 87, difficulty: "معمولی", type: "تستی", text: "مکملِ متممِ زاویه ۴۰ درجه چند درجه است؟", choices: ["130", "50", "140", "40"], answer: "130"},
+            {id: 88, difficulty: "معمولی", type: "تستی", text: "حجم مکعب مستطیلی با ابعاد ۰.۵، ۴ و ۱۰ سانتی‌متر چقدر است؟", choices: ["20", "40", "5", "10"], answer: "20"},
+            {id: 89, difficulty: "معمولی", type: "تستی", text: "اگر مقیاس نقشه‌ای ۱:۲۵۰۰۰ باشد، ۴ سانتی‌متر روی نقشه چند کیلومتر واقعی است؟", choices: ["1", "10", "100", "0.1"], answer: "1"},
+            {id: 90, difficulty: "معمولی", type: "تستی", text: "مجموع تمام شمارنده‌های عدد ۲۰ چند است؟", choices: ["20", "21", "41", "42"], answer: "42"},
+
+            // معمولی - درست/نادرست
+            {id: 91, difficulty: "معمولی", type: "درست/نادرست", text: "هر عدد که بر ۶ بخش‌پذیر باشد، بر ۲ و ۳ هم بخش‌پذیر است.", answer: "درست"},
+            {id: 92, difficulty: "معمولی", type: "درست/نادرست", text: "عدد ۲۵۵ بر ۹ بخش‌پذیر است.", answer: "نادرست"},
+            {id: 93, difficulty: "معمولی", type: "درست/نادرست", text: "مساحت متوازی‌الاضلاع با مساحت مستطیلی که طول و عرضش مساوی قاعده و ارتفاع آن است، برابر است.", answer: "درست"},
+            {id: 94, difficulty: "معمولی", type: "درست/نادرست", text: "قرینه هر عدد از خود آن عدد کوچکتر است.", answer: "نادرست"},
+            {id: 95, difficulty: "معمولی", type: "درست/نادرست", text: "قطرها در مستطیل بر هم عمود هستند.", answer: "نادرست"},
+            {id: 96, difficulty: "معمولی", type: "درست/نادرست", text: "حاصل کسر ۰/۱۰ با حاصل تقسیم ۱۰ بر ۰ برابر است.", answer: "نادرست"},
+            {id: 97, difficulty: "معمولی", type: "درست/نادرست", text: "چرخ کوچکتر در یک مسافت ثابت، تعداد دور بیشتری نسبت به چرخ بزرگتر می‌زند.", answer: "درست"},
+            {id: 98, difficulty: "معمولی", type: "درست/نادرست", text: "عدد ۹۱ تنها عدد دو رقمی است که بر ۱۳ بخش‌پذیر است.", answer: "نادرست"},
+            {id: 99, difficulty: "معمولی", type: "درست/نادرست", text: "در یک تناسب، اگر جای طرفین را عوض کنیم، تناسب همچنان درست است.", answer: "درست"},
+            {id: 100, difficulty: "معمولی", type: "درست/نادرست", text: "زاویه بین دو عقربه ساعت در ساعت ۴:۰۰، ۱۲۰ درجه است.", answer: "120"},
+
+            // معمولی - جا خالی
+            {id: 101, difficulty: "معمولی", type: "جا خالی", text: "متمم زاویه ۳۵ درجه، زاویه ....... درجه است.", answer: "55"},
+            {id: 102, difficulty: "معمولی", type: "جا خالی", text: "حاصل عبارت ۲ - ۳/۵ برابر با کسر ....... است.", answer: "7/5"},
+            {id: 103, difficulty: "معمولی", type: "جا خالی", text: "در عدد ۵۶.۷۸۹، ارزش مکانی رقم ۷، ....... است.", answer: "دهم"},
+            {id: 104, difficulty: "معمولی", type: "جا خالی", text: "مجموع اعداد ۱ تا ۲۰ برابر است با ....... .", answer: "210"},
+            {id: 105, difficulty: "معمولی", type: "جا خالی", text: "قرینه عدد (۴-) نسبت به عدد (۱-) برابر با ....... است.", answer: "2"},
+            {id: 106, difficulty: "معمولی", type: "جا خالی", text: "حاصل عبارت ۰.۸ × ۰.۰۷ برابر با ....... است.", answer: "0.056"},
+            {id: 107, difficulty: "معمولی", type: "جا خالی", text: "مجموع زوایای داخلی یک هفت‌ضلعی محدب ....... درجه است.", answer: "900"},
+            {id: 108, difficulty: "معمولی", type: "جا خالی", text: "عدد بعدی در الگوی ۱، ۸، ۲۷، ۶۴، ... عدد ....... است.", answer: "125"},
+            {id: 109, difficulty: "معمولی", type: "جا خالی", text: "برای تبدیل لیتر به سی‌سی، عدد را در ....... ضرب می‌کنیم.", answer: "1000"},
+            {id: 110, difficulty: "معمولی", type: "جا خالی", text: "حاصل‌ضرب ۰.۴ × ۰.۲۵ برابر با ....... است.", answer: "0.1"},
+
+            // معمولی - تشریحی
+            {id: 111, difficulty: "معمولی", type: "تشریحی", text: "شخصی ۴۰٪ پولش را خرج کرد و ۱۲۰۰۰ تومان برایش ماند. کل پولش چقدر بود؟", answer: "20000"},
+            {id: 112, difficulty: "معمولی", type: "تشریحی", text: "عدد ۱۲۰ را تجزیه درختی کن و آن را به صورت ضرب عوامل اول بنویس.", answer: "2×2×2×3×5"},
+            {id: 113, difficulty: "معمولی", type: "تشریحی", text: "مساحت زمینی متوازی‌الاضلاع به قاعده ۱۵.۵ و ارتفاع ۱۰ متر را حساب کن.", answer: "155"},
+            {id: 114, difficulty: "معمولی", type: "تشریحی", text: "چهار کسر بین ۱/۴ و ۱/۳ بنویس.", answer: "7/24"},
+            {id: 115, difficulty: "معمولی", type: "تشریحی", text: "مختصات سه نقطه را بنویس که با هم یک مثلث قائم‌الزاویه بسازند.", answer: "[0,0], [3,0], [0,4]"},
+            {id: 116, difficulty: "معمولی", type: "تشریحی", text: "کسر ۴۵/۶۰ را تا جای ممکن ساده کن.", answer: "3/4"},
+            {id: 117, difficulty: "معمولی", type: "تشریحی", text: "اعداد ۸-، ۵+، ۱- و ۷- را از بزرگ به کوچک مرتب کن.", answer: "+5، -1، -7، -8"},
+            {id: 119, difficulty: "معمولی", type: "تشریحی", text: "مساحت مربعی ۱۰۰ سانتی‌متر مربع است، محیط آن را پیدا کن.", answer: "40"},
+            {id: 120, difficulty: "معمولی", type: "تشریحی", text: "نسبت دو عدد ۵ به ۹ است، اگر اختلاف آن‌ها ۱۶ باشد، آن دو عدد را پیدا کن.", answer: "20 و 36"},
+
+            // سخت - تستی
+            {id: 121, difficulty: "سخت", type: "تستی", text: "حاصل عبارت ۱ - ۱/۲ × ۲/۳ × ۳/۴ × ... × ۹۹/۱۰۰ کدام است؟", choices: ["0.99", "0.01", "0.1", "0.9"], answer: "0.99"},
+            {id: 122, difficulty: "سخت", type: "تستی", text: "مجموع دو عدد اول ۳۷ است، حاصل‌ضرب آن‌ها کدام است؟", choices: ["37", "70", "74", "58"], answer: "58"},
+            {id: 123, difficulty: "سخت", type: "تستی", text: "اگر طول مستطیلی را ۵۰٪ افزایش و عرض را ۵۰٪ کاهش دهیم، مساحت چه تغییری می‌کند؟", choices: ["ثابت", "25٪ کم", "25٪ زیاد", "50٪ کم"], answer: "25٪ کم"},
+            {id: 124, difficulty: "سخت", type: "تستی", text: "چند عدد دو رقمی داریم که بر ۴ و ۶ بخش‌پذیر باشند؟", choices: ["7", "8", "9", "10"], answer: "8"},
+            {id: 125, difficulty: "سخت", type: "تستی", text: "زاویه بین دو عقربه ساعت در ساعت ۳:۳۰ چند درجه است؟", choices: ["75", "80", "90", "105"], answer: "75"},
+            {id: 126, difficulty: "سخت", type: "تستی", text: "حاصل عبارت ۱/۲ + ۱/۶ + ۱/۱۲ + ۱/۲۰ + ۱/۳۰ کدام است؟", choices: ["1/6", "5/6", "1", "1/5"], answer: "5/6"},
+            {id: 127, difficulty: "سخت", type: "تستی", text: "در یک مزرعه ۳۰ مرغ و گاو داریم. اگر تعداد پاها ۱۰۰ باشد، تعداد گاوها چند است؟", choices: ["10", "15", "20", "25"], answer: "20"},
+            {id: 128, difficulty: "سخت", type: "تستی", text: "قیمت کالایی ۲۵٪ افزایش یافته؛ برای برگشت به قیمت اول باید چند درصد تخفیف بدهیم؟", choices: ["20", "25", "30", "40"], answer: "20"},
+            {id: 129, difficulty: "سخت", type: "تستی", text: "کوچکترین عددی که بر ۳، ۴ و ۵ باقی‌مانده ۲ بیاورد؟", choices: ["12", "32", "62", "122"], answer: "62"},
+            {id: 130, difficulty: "سخت", type: "تستی", text: "اگر A = ۱+۲+۳+...+۵۰ باشد، مجموع ارقام A چند است؟", choices: ["10", "11", "12", "13"], answer: "15"},
+
+            // سخت - درست/نادرست
+            {id: 131, difficulty: "سخت", type: "درست/نادرست", text: "حاصل‌ضرب هر عدد در معکوسش، همیشه از خود آن عدد بزرگتر است (اگر عدد بین ۰ و ۱ باشد).", answer: "درست"},
+            {id: 132, difficulty: "سخت", type: "درست/نادرست", text: "عددی که بر ۲ و ۹ بخش‌پذیر باشد، بر ۱۸ هم بخش‌پذیر است.", answer: "درست"},
+            {id: 133, difficulty: "سخت", type: "درست/نادرست", text: "تعداد قطرهای یک ده-ضلعی برابر با ۳۵ است.", answer: "درست"},
+            {id: 134, difficulty: "سخت", type: "درست/نادرست", text: "نسبت مساحت دو دایره برابر با نسبت شعاع‌های آن‌ها است.", answer: "نادرست"},
+            {id: 135, difficulty: "سخت", type: "درست/نادرست", text: "عدد ۱۴۳ یک عدد اول است.", answer: "نادرست"},
+            {id: 136, difficulty: "سخت", type: "درست/نادرست", text: "تعداد شمارنده‌های عدد ۱۰۰ یک عدد فرد است.", answer: "درست"},
+            {id: 137, difficulty: "سخت", type: "درست/نادرست", text: "ب.م.م هر دو عدد متوالی همیشه ۱ است.", answer: "نادرست"},
+            {id: 138, difficulty: "سخت", type: "درست/نادرست", text: "مجموع دو عدد فرد متوالی همیشه بر ۴ بخش‌پذیر است.", answer: "درست"},
+            {id: 139, difficulty: "سخت", type: "درست/نادرست", text: "حجم مکعبی به ضلع ۰.۲ متر، ۸ لیتر است.", answer: "8"},
+            {id: 140, difficulty: "سخت", type: "درست/نادرست", text: "مساحت دایره‌ای به شعاع r برابر با نصفِ محیط در شعاع است.", answer: "درست"},
+
+            // سخت - جا خالی
+            {id: 141, difficulty: "سخت", type: "جا خالی", text: "حاصل ۰.۱۲ ÷ ۰.۰۰۴ برابر با ....... است.", answer: "30"},
+            {id: 142, difficulty: "سخت", type: "جا خالی", text: "مجموع زوایای داخلی یک n ضلعی برابر با (n-۲) × ....... است.", answer: "180"},
+            {id: 143, difficulty: "سخت", type: "جا خالی", text: "کسر مساوی با ۰.۶۶۶... برابر با کسر ساده شده ....... است.", answer: "2/3"},
+            {id: 144, difficulty: "سخت", type: "جا خالی", text: "اگر مساحت کل یک مکعب ۹۶ باشد، حجم آن ....... است.", answer: "64"},
+            {id: 145, difficulty: "سخت", type: "جا خالی", text: "مکملِ متممِ متممِ زاویه ۲۰ درجه، زاویه ....... درجه است.", answer: "110"},
+            {id: 146, difficulty: "سخت", type: "جا خالی", text: "حاصل‌جمع اعداد اول بین ۲۰ تا ۴۰ برابر با ....... است.", answer: "120"},
+            {id: 147, difficulty: "سخت", type: "جا خالی", text: "اگر شعاع دایره‌ای ۳ برابر شود، مساحت آن ....... برابر می‌شود.", answer: "800٪ زیاد"},
+            {id: 148, difficulty: "سخت", type: "جا خالی", text: "مقدار عددی x² - y² به ازای x=-۵ و y=-۳ برابر با ....... است.", answer: "16"},
+            {id: 149, difficulty: "سخت", type: "جا خالی", text: "در الگوی ۱، ۴، ۹، ۱۶، ... جمله دهم برابر با ....... است.", answer: "100"},
+            {id: 150, difficulty: "سخت", type: "جا خالی", text: "مکملِ مکملِ یک زاویه ۱۲۰ درجه، برابر با ....... درجه است.", answer: "120"},
+
+            // سخت - تشریحی
+            {id: 151, difficulty: "سخت", type: "تشریحی", text: "عددی را بیابید که اگر ۵ واحد از ۴ برابرش کم کنیم، مساوی با ۳ برابر آن عدد به علاوه ۱۰ شود.", answer: "15"},
+            {id: 152, difficulty: "سخت", type: "تشریحی", text: "میانگین دمای چهار شهر (۱۲-، ۸-، ۴+ و ۰) را حساب کن.", answer: "-4"},
+            {id: 153, difficulty: "سخت", type: "تشریحی", text: "نسبت قد علی به حسن ۳ به ۴ و قد حسن به سجاد ۵ به ۶ است. نسبت قد علی به سجاد؟", answer: "15 به 24"},
+            {id: 154, difficulty: "سخت", type: "تشریحی", text: "استخری به ابعاد ۴، ۵ و ۲ متر چند لیتر آب می‌گیرد؟", answer: "40000"},
+            {id: 155, difficulty: "سخت", type: "تشریحی", text: "ک.م.م دو عدد ۶۰ و ب.م.م آن‌ها ۶ است. اگر یکی از اعداد ۱۸ باشد، عدد دیگر؟", answer: "20"},
+            {id: 156, difficulty: "سخت", type: "تشریحی", text: "شخصی ۱/۴ پولش را به دوستش داد و ۱/۳ «باقی‌مانده» را خرج کرد. اگر ۱۰۰۰۰ تومان برایش مانده باشد، کل پول چقدر بود؟", answer: "20000"},
+            {id: 157, difficulty: "سخت", type: "تشریحی", text: "مجموع دو عدد اول ۶۱ است، حاصل‌ضرب آن‌ها را بیاب.", answer: "118"},
+            {id: 158, difficulty: "سخت", type: "تشریحی", text: "مساحت ذوزنقه‌ای که قاعده‌های آن ۱۰ و ۱۴ و ارتفاعش نصف قاعده بزرگ باشد را حساب کن.", answer: "84"},
+            {id: 159, difficulty: "سخت", type: "تشریحی", text: "حاصل را به صورت کسر ساده شده بنویس: ۱ - ۱/(۱ - ۱/۳)", answer: "1/2-"},
+            {id: 160, difficulty: "سخت", type: "تشریحی", text: "با دو ظرف ۴ و ۹ لیتری چگونه می‌توان ۶ لیتر آب از رودخانه برداشت؟", answer: "راه حل ظرف‌ها"},
+
+            // خیلی سخت - تستی
+            {id: 161, difficulty: "خیلی سخت", type: "تستی", text: "باقی‌مانده تقسیم ۱ + ۲ + ۳ + ... + ۲۰۰ بر عدد ۹ چند است؟", choices: ["0", "1", "3", "8"], answer: "3"},
+            {id: 162, difficulty: "خیلی سخت", type: "تستی", text: "چند عدد ۳ رقمی با ارقام متمایز وجود دارد که بر ۵ بخش‌پذیر باشد؟", choices: ["136", "128", "152", "144"], answer: "136"},
+            {id: 163, difficulty: "خیلی سخت", type: "تستی", text: "اگر x < y < ۰ باشد، حاصل |x-y| + |y-x| کدام است؟", choices: ["0", "2x-2y", "2y-2x", "1"], answer: "2y-2x"},
+            {id: 164, difficulty: "خیلی سخت", type: "تستی", text: "مساحت مربعی که محیط آن با محیط دایره‌ای به شعاع ۷ برابر است، چقدر است؟", choices: ["121", "484", "154", "49"], answer: "121"},
+            {id: 165, difficulty: "خیلی سخت", type: "تستی", text: "در الگوی ۲، ۶، ۱۲، ۲۰، ... جمله صدم کدام است؟", choices: ["9900", "10100", "10200", "11000"], answer: "10100"},
+            {id: 166, difficulty: "خیلی سخت", type: "تستی", text: "چند عدد ۳ رقمی بر ۵ و ۲ بخش‌پذیرند ولی بر ۳ بخش‌پذیر نیستند؟", choices: ["30", "60", "90", "100"], answer: "60"},
+            {id: 167, difficulty: "خیلی سخت", type: "تستی", text: "مساحت مربع ۱۰ در ۱۰ که از چهار طرف توسط ربع‌دایره‌هایی به شعاع ۵ بریده شده؟", choices: ["25", "50", "75", "100"], answer: "25"},
+            {id: 168, difficulty: "خیلی سخت", type: "تستی", text: "مجموع سه عدد متوالی ۱۶۲ است. حاصل‌ضرب دو عدد کوچکتر کدام است؟", choices: ["2862", "2916", "2756", "3080"], answer: "2862"},
+            {id: 169, difficulty: "خیلی سخت", type: "تستی", text: "حاصل‌ضرب ۱۰ عدد صحیح متوالی حتماً بر کدام بخش‌پذیر است؟", choices: ["1000", "3628800", "5000", "هیچ‌کدام"], answer: "3628800"},
+            {id: 170, difficulty: "خیلی سخت", type: "تستی", text: "تعداد صفرهای انتهای حاصل‌ضرب اعداد ۱ تا ۱۰۰ چند است؟", choices: ["20", "21", "24", "25"], answer: "24"},
+
+            // خیلی سخت - درست/نادرست
+            {id: 171, difficulty: "خیلی سخت", type: "درست/نادرست", text: "حاصل ۰.۹ × ۰.۹۹ × ۰.۹۹۹ × ... همیشه کوچکتر از ۱ است.", answer: "درست"},
+            {id: 172, difficulty: "خیلی سخت", type: "درست/نادرست", text: "ب.م.م هر دو عدد فرد متوالی همیشه ۱ است.", answer: "درست"},
+            {id: 173, difficulty: "خیلی سخت", type: "درست/نادرست", text: "اگر حجم مکعبی ۸ برابر شود، سطح کل آن ۴ برابر می‌شود.", answer: "درست"},
+            {id: 174, difficulty: "خیلی سخت", type: "درست/نادرست", text: "عدد ۲ به توان ۲۰ بیش از یک میلیون است.", answer: "درست"},
+            {id: 175, difficulty: "خیلی سخت", type: "درست/نادرست", text: "مجموع هر ۴ عدد اول متوالی (به جز ۲، ۳، ۵، ۷) همیشه بر ۴ بخش‌پذیر است.", answer: "نادرست"},
+            {id: 176, difficulty: "خیلی سخت", type: "درست/نادرست", text: "کسر تلسکوپی ۱/(۱×۲) + ۱/(۲×۳) + ... تا بی‌نهایت مساوی ۱ است.", answer: "درست"},
+            {id: 177, difficulty: "خیلی سخت", type: "درست/نادرست", text: "در مثلث قائم‌الزاویه، مجموع مربعات دو ضلع کوتاه برابر با مربع وتر است.", answer: "درست"},
+            {id: 178, difficulty: "خیلی سخت", type: "درست/نادرست", text: "عدد 3^4 بزرگتر از 4^3 است.", answer: "درست"},
+            {id: 179, difficulty: "خیلی سخت", type: "درست/نادرست", text: "حاصل‌ضرب یک عدد گویا در یک عدد گنگ، همیشه گنگ است (به جز صفر).", answer: "درست"},
+            {id: 180, difficulty: "خیلی سخت", type: "درست/نادرست", text: "هر عدد طبیعی زوج بزرگتر از ۲، مجموع دو عدد اول است (حدس گلدباخ).", answer: "درست"},
+
+            // خیلی سخت - جا خالی
+            {id: 181, difficulty: "خیلی سخت", type: "جا خالی", text: "تعداد شمارنده‌های عدد ۱۴۴ برابر با ....... است.", answer: "9"},
+            {id: 182, difficulty: "خیلی سخت", type: "جا خالی", text: "مجموع ۱/۳ + ۱/۹ + ۱/۲۷ + ... تا بی‌نهایت به عدد ....... نزدیک می‌شود.", answer: "0.5"},
+            {id: 183, difficulty: "خیلی سخت", type: "جا خالی", text: "رقم یکان حاصل 2^100 برابر با ....... است.", answer: "6"},
+            {id: 184, difficulty: "خیلی سخت", type: "جا خالی", text: "اگر مجموع دو عدد اول ۹۹۹ باشد، حاصل‌ضرب آن‌ها ....... است.", answer: "1994"},
+            {id: 185, difficulty: "خیلی سخت", type: "جا خالی", text: "تعداد قطرهای یک n ضلعی از رابطه ....... به دست می‌آید.", answer: "n(n-3)/2"},
+            {id: 186, difficulty: "خیلی سخت", type: "جا خالی", text: "تعداد صفرهای انتهای حاصل‌ضرب اعداد ۱ تا ۵۰ برابر با ....... است.", answer: "12"},
+            {id: 187, difficulty: "خیلی سخت", type: "جا خالی", text: "مجموع زوایای داخلی ۱۰-ضلعی منتظم ....... درجه است.", answer: "1440"},
+            {id: 188, difficulty: "خیلی سخت", type: "جا خالی", text: "اگر x بین ۱- و ۰ باشد، حاصل x² از x ....... است (بزرگتر/کوچکتر).", answer: "بزرگتر"},
+            {id: 189, difficulty: "خیلی سخت", type: "جا خالی", text: "غلظت نمک در ۱۰ لیتر آب ۲۰٪ است؛ اگر ۵ لیتر آب تبخیر شود غلظت جدید ....... ٪ می‌شود.", answer: "40"},
+            {id: 190, difficulty: "خیلی سخت", type: "جا خالی", text: "کوچکترین عددی که با ضرب در ۷۲ آن را مکعب کامل کند عدد ....... است.", answer: "6"},
+
+            // خیلی سخت - تشریحی
+            {id: 191, difficulty: "خیلی سخت", type: "تشریحی", text: "در یک آزمون ۲۰ سوالی، هر پاسخ درست ۵ امتیاز مثبت و هر پاسخ غلط ۲ امتیاز منفی دارد. اگر علی ۱۳ امتیاز گرفته باشد، چند پاسخ درست داشته؟", answer: "9"},
+            {id: 192, difficulty: "خیلی سخت", type: "تشریحی", text: "ثابت کن تفاضل هر عدد ۲ رقمی از مقلوبش همیشه بر ۹ بخش‌پذیر است.", answer: "اثبات جبری"},
+            {id: 193, difficulty: "خیلی سخت", type: "تشریحی", text: "عقربه‌های ساعت در هر شبانه‌روز چند بار روی هم قرار می‌گیرند؟", answer: "22"},
+            {id: 194, difficulty: "خیلی سخت", type: "تشریحی", text: "شخصی ۱/۲ پولش را خرج کرد، سپس ۱/۲ باقی‌مانده و به همین ترتیب تا ۵ مرحله. اگر ۱۰ دلار برایش مانده باشد، پول اولیه‌اش چقدر بوده؟", answer: "320"},
+            {id: 195, difficulty: "خیلی سخت", type: "تشریحی", text: "مساحت ناحیه مشترک بین دو دایره به شعاع ۱۰ که مرکز هر کدام روی محیط دیگری است را حساب کن.", answer: "122.8"},
+            {id: 196, difficulty: "خیلی سخت", type: "تشریحی", text: "رقم یکان 3^400 را با استدلال پیدا کن.", answer: "1"},
+            {id: 197, difficulty: "خیلی سخت", type: "تشریحی", text: "مکعبی را به ۲۷ مکعب کوچک تقسیم کردیم و سطح بیرونی را رنگ زدیم؛ چند مکعب کوچک فقط یک وجه رنگی دارند؟", answer: "6"},
+            {id: 198, difficulty: "خیلی سخت", type: "تشریحی", text: "دو شیر آب مخزنی را به ترتیب در ۳ و ۴ ساعت پر می‌کنند و شیر تخلیه در ۶ ساعت خالی می‌کند. اگر هر سه باز باشند، مخزن کی پر می‌شود؟", answer: "2.4"},
+            {id: 199, difficulty: "خیلی سخت", type: "تشریحی", text: "مقدار S = ۱ + ۱/۲ + ۱/۴ + ۱/۸ + ... را دقیق حساب کن.", answer: "2"},
+            {id: 200, difficulty: "خیلی سخت", type: "تشریحی", text: "باقی‌مانده تقسیم 2^50 بر ۷ را با استفاده از الگو پیدا کن.", answer: "4"}
+        ];
+
+        let selectedOptions = {
+            grade: "6",
+            difficulty: null,
+            type: null,
+            subject: "ریاضی"
+        };
+
+        let currentQuestion = null;
+        let userAnswer = null;
+
+        // Handle option selection
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('option-btn')) {
+                const option = e.target.dataset.option;
+                const value = e.target.dataset.value;
+
+                // Remove active class from siblings
+                const siblings = e.target.parentElement.querySelectorAll('.option-btn');
+                siblings.forEach(btn => btn.classList.remove('active'));
+
+                // Add active class to clicked button
+                e.target.classList.add('active');
+
+                // Save selection
+                selectedOptions[option] = value;
+            }
+        });
+
+        function showQuestion() {
+            if (!selectedOptions.difficulty || !selectedOptions.type) {
+                alert('لطفاً سختی و حالت سوال را انتخاب کنید!');
+                return;
+            }
+
+            // Filter questions based on selection
+            const filteredQuestions = questions.filter(q => 
+                q.difficulty === selectedOptions.difficulty && 
+                q.type === selectedOptions.type
+            );
+
+            if (filteredQuestions.length === 0) {
+                alert('سوالی با این مشخصات یافت نشد!');
+                return;
+            }
+
+            // Pick random question
+            currentQuestion = filteredQuestions[Math.floor(Math.random() * filteredQuestions.length)];
+
+            // Display question
+            document.getElementById('questionTypeBadge').textContent = currentQuestion.type;
+            document.getElementById('questionText').textContent = currentQuestion.text;
+
+            // Reset feedback
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('feedback').className = 'feedback';
+
+            // Handle different question types
+            const choicesContainer = document.getElementById('choicesContainer');
+            const answerInputContainer = document.getElementById('answerInputContainer');
+
+            if (currentQuestion.type === 'تستی') {
+                choicesContainer.innerHTML = '';
+                currentQuestion.choices.forEach(choice => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn';
+                    btn.textContent = choice;
+                    btn.onclick = function() {
+                        document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+                        this.classList.add('selected');
+                        userAnswer = choice;
+                    };
+                    choicesContainer.appendChild(btn);
+                });
+                choicesContainer.style.display = 'flex';
+                answerInputContainer.style.display = 'none';
+            } else if (currentQuestion.type === 'درست/نادرست') {
+                choicesContainer.innerHTML = '';
+                ['درست', 'نادرست'].forEach(choice => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn';
+                    btn.textContent = choice;
+                    btn.onclick = function() {
+                        document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+                        this.classList.add('selected');
+                        userAnswer = choice;
+                    };
+                    choicesContainer.appendChild(btn);
+                });
+                choicesContainer.style.display = 'flex';
+                answerInputContainer.style.display = 'none';
+            } else {
+                choicesContainer.style.display = 'none';
+                answerInputContainer.style.display = 'block';
+                document.getElementById('answerInput').value = '';
+            }
+
+            // Show question screen
+            document.getElementById('selectionScreen').style.display = 'none';
+            document.getElementById('questionScreen').style.display = 'block';
+        }
+
+        function checkAnswer() {
+            if (currentQuestion.type === 'جا خالی' || currentQuestion.type === 'تشریحی') {
+                userAnswer = document.getElementById('answerInput').value.trim();
+            }
+
+            if (!userAnswer) {
+                alert('لطفاً پاسخی وارد کنید یا انتخاب کنید!');
+                return;
+            }
+
+            const feedbackEl = document.getElementById('feedback');
+            const correctAnswer = currentQuestion.answer;
+
+            // Normalize answers for comparison
+            const normalizedUserAnswer = userAnswer.toString().trim().toLowerCase().replace(/\s+/g, '');
+            const normalizedCorrectAnswer = correctAnswer.toString().trim().toLowerCase().replace(/\s+/g, '');
+
+            if (normalizedUserAnswer === normalizedCorrectAnswer) {
+                feedbackEl.className = 'feedback correct';
+                feedbackEl.textContent = '✓ آفرین! پاسخ شما درست است!';
+            } else {
+                feedbackEl.className = 'feedback incorrect';
+                feedbackEl.textContent = `✗ پاسخ اشتباه است! پاسخ صحیح: ${correctAnswer}`;
+            }
+
+            feedbackEl.style.display = 'block';
+        }
+
+        function nextQuestion() {
+            userAnswer = null;
+            showQuestion();
+        }
+
+        function backToSelection() {
+            document.getElementById('selectionScreen').style.display = 'block';
+            document.getElementById('questionScreen').style.display = 'none';
+            currentQuestion = null;
+            userAnswer = null;
+        }
     </script>
 </body>
 </html>
