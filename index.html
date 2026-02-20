@@ -3,6 +3,907 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستم آزمون ریاضی</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-option label {
+            display: block;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 0;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .radio-option label:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .question-page {
+            display: none;
+        }
+
+        .question-text {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 1.3em;
+            line-height: 1.6;
+            border-right: 5px solid #667eea;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            padding: 20px;
+            border: 3px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: right;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .option-btn:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .option-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .result-message {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            animation: bounceIn 0.5s;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .result-message.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .result-message.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .correct-answer-display {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.2em;
+            border: 2px solid #bee5eb;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .score-display h2 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 30px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .question-counter {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .true-false-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .true-false-btn {
+            flex: 1;
+            padding: 25px;
+            border: 3px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .true-false-btn:hover {
+            transform: translateY(-2px);
+            border-color: #667eea;
+        }
+
+        .true-false-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .button-group button {
+            margin-top: 0;
+        }
+
+        .secondary-btn {
+            background: #6c757d !important;
+        }
+
+        .secondary-btn:hover {
+            background: #5a6268 !important;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .radio-group {
+                flex-direction: column;
+            }
+
+            .radio-option {
+                min-width: 100%;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- صفحه انتخاب تنظیمات -->
+        <div id="settings-page">
+            <h1>🎓 سیستم آزمون ریاضی</h1>
+
+            <div class="section">
+                <label>پایه تحصیلی:</label>
+                <select id="grade-select">
+                    <option value="6">ششم ابتدایی</option>
+                    <option value="7" disabled>هفتم (قفل)</option>
+                    <option value="8" disabled>هشتم (قفل)</option>
+                    <option value="9" disabled>نهم (قفل)</option>
+                </select>
+            </div>
+
+            <div class="section">
+                <label>درس مورد نظر:</label>
+                <select id="subject-select">
+                    <option value="math">ریاضی</option>
+                    <option value="science" disabled>علوم (قفل)</option>
+                    <option value="persian" disabled>فارسی (قفل)</option>
+                    <option value="english" disabled>انگلیسی (قفل)</option>
+                </select>
+            </div>
+
+            <div class="section">
+                <label>نوع سوال:</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" name="question-type" id="type-test" value="test" checked>
+                        <label for="type-test">تستی</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="question-type" id="type-essay" value="essay">
+                        <label for="type-essay">تشریحی</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="question-type" id="type-blank" value="blank">
+                        <label for="type-blank">جای خالی</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="question-type" id="type-tf" value="truefalse">
+                        <label for="type-tf">درست/نادرست</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <label>سختی سوال:</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" name="difficulty" id="diff-easy" value="easy" checked>
+                        <label for="diff-easy">آسان</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="difficulty" id="diff-normal" value="normal">
+                        <label for="diff-normal">معمولی</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="difficulty" id="diff-hard" value="hard">
+                        <label for="diff-hard">سخت</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <label>تعداد سوالات:</label>
+                <input type="number" id="question-count" min="1" max="20" value="5">
+            </div>
+
+            <button onclick="startQuiz()">شروع آزمون 🚀</button>
+        </div>
+
+        <!-- صفحه نمایش سوال -->
+        <div id="question-page" class="question-page">
+            <div class="question-counter" id="question-counter"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill">0%</div>
+            </div>
+            
+            <div class="question-text" id="question-text"></div>
+            
+            <!-- برای سوالات تستی -->
+            <div id="test-options" class="options-container" style="display:none;"></div>
+            
+            <!-- برای سوالات درست/نادرست -->
+            <div id="tf-options" class="true-false-container" style="display:none;">
+                <button class="true-false-btn" onclick="selectTrueFalse('درست')">✓ درست</button>
+                <button class="true-false-btn" onclick="selectTrueFalse('نادرست')">✗ نادرست</button>
+            </div>
+            
+            <!-- برای سوالات جای خالی و تشریحی -->
+            <textarea id="answer-input" class="answer-input" rows="4" placeholder="پاسخ خود را اینجا بنویسید..." style="display:none;"></textarea>
+            
+            <div id="result-message"></div>
+            <div id="correct-answer"></div>
+            
+            <div class="button-group" id="button-group">
+                <button id="submit-btn" onclick="submitAnswer()">اتمام ✓</button>
+            </div>
+        </div>
+
+        <!-- صفحه نمایش نمره نهایی -->
+        <div id="score-page" style="display:none;">
+            <h1>نتیجه نهایی 🎉</h1>
+            <div class="score-display">
+                <h2 id="final-score"></h2>
+                <p style="font-size: 1.2em; margin-top: 10px;" id="score-message"></p>
+            </div>
+            <button onclick="resetQuiz()">بازگشت به صفحه اصلی 🏠</button>
+        </div>
+    </div>
+
+    <script>
+        // دیتابیس سوالات (فقط سوالات بدون کسر و منفی)
+        const questionsDatabase = {
+            easy: {
+                test: [
+                    { id: 1, q: "کوچکترین عدد طبیعی کدام است؟", options: ["۱", "۰", "۲", "۱۰"], a: "۰" },
+                    { id: 2, q: "کدام عدد بر ۲ بخش‌پذیر است؟", options: ["۱۳", "۲۵", "۴۸", "۵۱"], a: "۴۸" },
+                    { id: 4, q: "محیط مربعی به ضلع ۴ چند است؟", options: ["۸", "۱۲", "۱۶", "۲۰"], a: "۱۶" },
+                    { id: 6, q: "عدد بعدی الگوی ۵، ۱۰، ۱۵ کدام است؟", options: ["۱۶", "۲۰", "۲۵", "۳۰"], a: "۲۰" },
+                    { id: 7, q: "ربع عدد ۲۰ چند است؟", options: ["۴", "۵", "۱۰", "۲"], a: "۵" },
+                    { id: 8, q: "کدام عدد اول است؟", options: ["۴", "۶", "۷", "۹"], a: "۷" },
+                    { id: 9, q: "مجموع زوایای داخلی مثلث چند درجه است؟", options: ["۹۰", "۱۸۰", "۳۶۰", "۲۷۰"], a: "۱۸۰" },
+                    { id: 12, q: "واحد اندازه‌گیری جرم چیست؟", options: ["متر", "لیتر", "گرم", "ثانیه"], a: "گرم" },
+                    { id: 15, q: "مساحت مستطیلی به طول ۵ و عرض ۲ چند است؟", options: ["۷", "۱۰", "۱۲", "۱۵"], a: "۱۰" },
+                    { id: 16, q: "کدام عدد فرد است؟", options: ["۱۲", "۲۴", "۳۷", "۴۰"], a: "۳۷" },
+                    { id: 17, q: "نصف عدد ۱۰۰ چند است؟", options: ["۲۵", "۵۰", "۷۵", "۱۰"], a: "۵۰" },
+                    { id: 18, q: "بزرگترین عدد یک‌رقمی کدام است؟", options: ["۷", "۸", "۹", "۱۰"], a: "۹" }
+                ],
+                truefalse: [
+                    { id: 19, q: "عدد ۱ نه اول است و نه مرکب.", a: "درست" },
+                    { id: 20, q: "تمام اعداد زوج بر ۲ بخش‌پذیرند.", a: "درست" },
+                    { id: 21, q: "مساحت مربع برابر است با یک ضلع ضربدر ۴.", a: "نادرست" },
+                    { id: 22, q: "حاصل‌ضرب هر عدد در ۱، خودش می‌شود.", a: "درست" },
+                    { id: 23, q: "مخرج کسر می‌تواند صفر باشد.", a: "نادرست" },
+                    { id: 24, q: "مثلث متساوی‌الاضلاع ۳ ضلع مساوی دارد.", a: "درست" },
+                    { id: 25, q: "عدد ۱۰ بر ۳ بخش‌پذیر است.", a: "نادرست" },
+                    { id: 27, q: "قرینه عدد صفر، خود صفر است.", a: "درست" },
+                    { id: 28, q: "محیط دایره برابر با قطر ضربدر عدد پی است.", a: "درست" },
+                    { id: 29, q: "هر عدد اول حتماً فرد است.", a: "نادرست" },
+                    { id: 30, q: "حاصل ۵ تقسیم بر ۱ برابر با ۵ است.", a: "درست" },
+                    { id: 31, q: "شعاع دایره نصف قطر آن است.", a: "درست" },
+                    { id: 32, q: "عدد بزرگترین مقسوم علیه مشترک دو عدد ۱ و ۱۰ برابر با ۱ است.", a: "درست" },
+                    { id: 33, q: "عدد ۲ تنها عدد زوج اول است.", a: "درست" },
+                    { id: 34, q: "برای جمع دو کسر، باید مخرج‌ها مساوی باشند.", a: "درست" },
+                    { id: 35, q: "قرینه قرینه هر عدد، خودش است.", a: "درست" },
+                    { id: 36, q: "اعداد طبیعی از صفر شروع می‌شوند.", a: "نادرست" }
+                ],
+                blank: [
+                    { id: 38, q: "عدد ۱۸ بر عدد چند بخش‌پذیر است؟ یک مورد بنویسید", a: ["۲", "۳", "۶", "۹", "۱۸", "2", "3", "6", "9", "18"] },
+                    { id: 39, q: "مجموع زوایای یک مستطیل چند درجه است؟", a: ["۳۶۰", "360"] },
+                    { id: 42, q: "واحد اندازه‌گیری حجم مایعات چیست؟", a: ["لیتر"] },
+                    { id: 43, q: "عدد بعدی در الگوی ۳، ۶، ۹ کدام است؟", a: ["۱۲", "12"] },
+                    { id: 45, q: "هر متر برابر با چند سانتی‌متر است؟", a: ["۱۰۰", "100"] },
+                    { id: 46, q: "مساحت مربعی به ضلع ۳ برابر با چند است؟", a: ["۹", "9"] },
+                    { id: 47, q: "به جواب عمل تقسیم چه می‌گویند؟", a: ["خارج قسمت", "خارج‌قسمت", "خارج"] },
+                    { id: 48, q: "در کسر، به عدد بالایی چه می‌گویند؟", a: ["صورت"] },
+                    { id: 49, q: "متمم زاویه ۲۰ درجه، زاویه چند درجه است؟", a: ["۷۰", "70"] },
+                    { id: 50, q: "مجموع زوایای داخلی چهارضلعی چند درجه است؟", a: ["۳۶۰", "360"] },
+                    { id: 51, q: "حاصل ۰ ضربدر ۱۲۳ برابر با چند است؟", a: ["۰", "0"] },
+                    { id: 52, q: "عدد قبل از ۱۰۰، عدد چند است؟", a: ["۹۹", "99"] }
+                ],
+                essay: [
+                    { id: 55, q: "عدد ۲۰ را به صورت ضرب دو عدد بنویس.", a: "" },
+                    { id: 57, q: "محیط مثلثی با اضلاع ۳، ۳ و ۳ را به دست آور.", a: "" },
+                    { id: 58, q: "عدد هزار و پنجاه را به رقم بنویس.", a: "" },
+                    { id: 59, q: "سه عدد اولِ کوچک‌تر از ۱۰ را نام ببر.", a: "" },
+                    { id: 62, q: "مساحت مربعی به ضلع ۷ را حساب کن.", a: "" },
+                    { id: 67, q: "گسترده مکعب از چند مربع ساخته شده است؟", a: "" },
+                    { id: 68, q: "حاصل ۱۰ ضربدر ۱۱ را حساب کن.", a: "" },
+                    { id: 69, q: "مجموع اعداد ۱، ۲ و ۳ چند است؟", a: "" },
+                    { id: 70, q: "شکل یک مستطیل را بکش و طول و عرض آن را مشخص کن.", a: "" },
+                    { id: 72, q: "خمس عدد ۱۵ را پیدا کن.", a: "" }
+                ]
+            },
+            normal: {
+                test: [
+                    { id: 74, q: "کدام عدد بر ۹ بخش‌پذیر است؟", options: ["۱۲۳", "۳۴۵", "۴۵۹", "۱۱۱"], a: "۴۵۹" },
+                    { id: 75, q: "مساحت مربعی به قطر ۴ سانتی‌متر چقدر است؟", options: ["۸", "۱۶", "۴", "۳۲"], a: "۸" },
+                    { id: 78, q: "کدام گزینه ویژگی لوزی است؟", options: ["قطرها مساوی", "قطرها عمود", "۴ زاویه قائمه", "همه موارد"], a: "قطرها عمود" },
+                    { id: 79, q: "متممِ متممِ زاویه ۳۰ درجه چند است؟", options: ["۶۰", "۳۰", "۹۰", "۱۸۰"], a: "۳۰" },
+                    { id: 80, q: "حجم مکعبی به ضلع ۲ چند است؟", options: ["۴", "۶", "۸", "۱۲"], a: "۸" },
+                    { id: 81, q: "مقیاس ۱ به ۲۰۰ یعنی ۱ سانتی‌متر نقشه برابر با چند متر است؟", options: ["۱", "۲", "۲۰۰", "۲۰"], a: "۲" },
+                    { id: 82, q: "میانگین اعداد ۱۲، ۱۴ و ۱۶ چند است؟", options: ["۱۲", "۱۳", "۱۴", "۱۵"], a: "۱۴" },
+                    { id: 86, q: "مجموع شمارنده‌های اول عدد ۲۰ چند است؟", options: ["۵", "۷", "۹", "۱۰"], a: "۷" },
+                    { id: 87, q: "مکمل زاویه ۷۰ درجه چند است؟", options: ["۲۰", "۱۱۰", "۱۸۰", "۴۰"], a: "۱۱۰" },
+                    { id: 88, q: "کوچکترین عدد سه رقمی بدون تکرار کدام است؟", options: ["۱۰۰", "۱۰۱", "۱۰۲", "۱۲۳"], a: "۱۰۲" },
+                    { id: 89, q: "اگر شعاع دایره ۳ باشد، محیط آن چقدر است با فرض پی برابر ۳؟", options: ["۹", "۱۸", "۲۷", "۶"], a: "۱۸" },
+                    { id: 90, q: "حاصل عبارت ۱۲ منهای ۴ ضربدر ۲ چند است؟", options: ["۱۶", "۴", "۸", "۱"], a: "۴" }
+                ],
+                truefalse: [
+                    { id: 91, q: "هر عددی که بر ۹ بخش‌پذیر باشد، بر ۳ هم بخش‌پذیر است.", a: "درست" },
+                    { id: 92, q: "مساحت دایره برابر با شعاع ضربدر شعاع ضربدر ۳.۱۴ است.", a: "درست" },
+                    { id: 93, q: "حاصل‌ضرب هر عدد در معکوسش مساوی ۱ است.", a: "درست" },
+                    { id: 94, q: "مستطیل یک نوع لوزی است.", a: "نادرست" },
+                    { id: 96, q: "بزرگترین مقسوم علیه مشترک دو عدد متوالی همیشه ۱ است.", a: "درست" },
+                    { id: 98, q: "عدد ۹۱ یک عدد اول است.", a: "نادرست" },
+                    { id: 99, q: "مجموع زوایای داخلی پنج‌ضلعی ۵۴۰ درجه است.", a: "درست" },
+                    { id: 100, q: "نسبت محیط مربع به ضلع آن همیشه ۴ است.", a: "درست" },
+                    { id: 101, q: "قرینه صفر، خودش است.", a: "درست" },
+                    { id: 102, q: "ضرب کسر در معکوسش همیشه ۱ است.", a: "درست" },
+                    { id: 103, q: "عدد ۱۷ یک عدد اول است.", a: "درست" },
+                    { id: 104, q: "متمم زاویه ۴۵ درجه، ۵۵ درجه است.", a: "نادرست" },
+                    { id: 106, q: "محیط مثلث متساوی‌الاضلاع ۳ برابر ضلع آن است.", a: "درست" },
+                    { id: 107, q: "عدد ۱۰ بر ۴ بخش‌پذیر است.", a: "نادرست" },
+                    { id: 108, q: "تمام اعداد اول، فرد هستند به جز ۲.", a: "درست" }
+                ],
+                blank: [
+                    { id: 110, q: "عدد بعدی در الگوی ۱، ۴، ۹، ۱۶ کدام است؟", a: ["۲۵", "25"] },
+                    { id: 111, q: "مساحت مثلث برابر است با قاعده ضربدر ارتفاع تقسیم بر چند؟", a: ["۲", "2"] },
+                    { id: 114, q: "اگر شعاع دایره ۲ برابر شود، محیط آن چند برابر می‌شود؟", a: ["۲", "2"] },
+                    { id: 115, q: "متممِ متممِ یک زاویه همیشه با چه چیزی برابر است؟", a: ["خودش", "خود زاویه"] },
+                    { id: 116, q: "عددی که بر ۲ و ۳ بخش‌پذیر باشد، بر چند هم بخش‌پذیر است؟", a: ["۶", "6"] },
+                    { id: 117, q: "کوچکترین مخرج مشترک برای ۳ و ۵ عدد چند است؟", a: ["۱۵", "15"] },
+                    { id: 120, q: "مکمل زاویه ۹۰ درجه، زاویه چند درجه است؟", a: ["۹۰", "90"] },
+                    { id: 122, q: "عددی که مقسوم‌علیه تمام اعداد است، عدد چند نام دارد؟", a: ["۱", "1", "یک"] },
+                    { id: 123, q: "به چهارضلعی که فقط دو ضلع موازی دارد، چه می‌گویند؟", a: ["ذوزنقه"] },
+                    { id: 124, q: "حاصل‌جمع اعداد صحیح از سه منفی تا سه مثبت برابر با چند است؟", a: ["۰", "0", "صفر"] },
+                    { id: 125, q: "مجموع زوایای یک پنج‌ضلعی چند درجه است؟", a: ["۵۴۰", "540"] },
+                    { id: 126, q: "مساحت متوازی‌الاضلاع برابر است با قاعده ضربدر چه چیزی؟", a: ["ارتفاع"] }
+                ],
+                essay: [
+                    { id: 128, q: "عدد ۴۰ را تجزیه درختی کن.", a: "" },
+                    { id: 129, q: "مساحت متوازی‌الاضلاعی با قاعده ۶ و ارتفاع ۴ را حساب کن.", a: "" },
+                    { id: 131, q: "میانگین نمرات ۱۰، ۱۵ و ۲۰ را حساب کن.", a: "" },
+                    { id: 132, q: "مساحت دایره‌ای به شعاع ۳ را حساب کن با فرض پی برابر ۳.", a: "" },
+                    { id: 133, q: "مختصات دو نقطه بنویس که روی یک خط عمودی باشند.", a: "" },
+                    { id: 137, q: "مکملِ متمم زاویه ۳۰ درجه را حساب کن.", a: "" },
+                    { id: 138, q: "نسبت آبی به قرمز ۲ به ۳ است، اگر ۶ آبی باشد، قرمز چند است؟", a: "" },
+                    { id: 142, q: "یک ذوزنقه رسم کن و قاعده‌های آن را نشان بده.", a: "" },
+                    { id: 143, q: "بزرگترین مقسوم علیه مشترک دو عدد ۸ و ۱۲ را پیدا کن.", a: "" }
+                ]
+            },
+            hard: {
+                test: [
+                    { id: 146, q: "مجموع دو عدد اول ۳۱ است، حاصل‌ضرب آن‌ها چند است؟", options: ["۵۸", "۶۰", "۶۲", "۳۱"], a: "۵۸" },
+                    { id: 148, q: "چند عدد دو رقمی هم بر ۴ و هم بر ۶ بخش‌پذیرند؟", options: ["۷", "۸", "۹", "۱۰"], a: "۸" },
+                    { id: 149, q: "زاویه بین عقربه‌ها در ساعت ۲ و سی دقیقه چند درجه است؟", options: ["۷۵", "۹۰", "۱۰۵", "۱۲۰"], a: "۱۰۵" },
+                    { id: 152, q: "مجموع ارقام ۹۹ ضربدر ۹۹ چند است؟", options: ["۱۸", "۲۷", "۳۶", "۹"], a: "۱۸" },
+                    { id: 153, q: "باقی‌مانده مجموع ۱ تا ۱۰۰ بر ۹ چند است؟", options: ["۰", "۱", "۳", "۶"], a: "۱" },
+                    { id: 154, q: "چند عدد ۳ رقمی بر ۲ و ۵ بخش‌پذیرند ولی بر ۳ نه؟", options: ["۳۰", "۶۰", "۹۰", "۲۰"], a: "۶۰" },
+                    { id: 155, q: "مساحت مربعی با قطر جذر ۸ چند است؟", options: ["۴", "۸", "۱۶", "۶۴"], a: "۴" },
+                    { id: 156, q: "رقم یکان ۷ به توان ۲۰ چند است؟", options: ["۷", "۹", "۳", "۱"], a: "۱" },
+                    { id: 157, q: "مجموع دو عدد اول ۹۹۹ است، حاصل‌ضرب؟", options: ["۱۹۹۴", "۱۹۹۸", "۲۹۹۷", "۳۹۹۶"], a: "۱۹۹۴" },
+                    { id: 158, q: "تعداد قطرهای هشت‌ضلعی چندتاست؟", options: ["۲۰", "۱۴", "۲۸", "۱۶"], a: "۲۰" },
+                    { id: 161, q: "مکملِ متممِ متمم زاویه ۲۰ درجه چند است؟", options: ["۷۰", "۱۱۰", "۱۶۰", "۲۰"], a: "۱۶۰" },
+                    { id: 162, q: "مساحت جانبی مکعبی به ضلع ۲ چند است؟", options: ["۴", "۸", "۱۶", "۲۴"], a: "۱۶" }
+                ],
+                truefalse: [
+                    { id: 163, q: "حاصل‌ضرب ۱۰ عدد متوالی حتماً بر ۱۲۰ بخش‌پذیر است.", a: "درست" },
+                    { id: 164, q: "بزرگترین مقسوم علیه مشترک هر دو عدد فرد متوالی ۱ است.", a: "درست" },
+                    { id: 165, q: "اگر ضلع مکعب ۳ برابر شود، حجم ۹ برابر می‌شود.", a: "نادرست" },
+                    { id: 166, q: "عدد ۲ به توان ۱۰ بزرگتر از ۱۰۰۰ است.", a: "درست" },
+                    { id: 167, q: "مجموع هر ۳ عدد متوالی بر ۳ بخش‌پذیر است.", a: "درست" },
+                    { id: 169, q: "عدد ۹۱ یک عدد مرکب است.", a: "درست" },
+                    { id: 170, q: "هر لوزی با قطرهای مساوی، مربع است.", a: "درست" },
+                    { id: 171, q: "حاصل‌ضرب دو عدد گنگ حتماً گنگ است.", a: "نادرست" },
+                    { id: 172, q: "مجموع زوایای خارجی هر چند ضلعی ۳۶۰ درجه است.", a: "درست" },
+                    { id: 173, q: "تعداد شمارنده‌های مجذور کامل همیشه فرد است.", a: "درست" },
+                    { id: 174, q: "تفاضل دو عدد اول همیشه زوج است.", a: "نادرست" },
+                    { id: 176, q: "عدد ۲ به توان ۵ برابر با ۲۵ است.", a: "نادرست" },
+                    { id: 178, q: "مجموع دو عدد اول همیشه مرکب است.", a: "نادرست" },
+                    { id: 179, q: "حجم استوانه برابر با مساحت قاعده ضربدر ارتفاع است.", a: "درست" },
+                    { id: 180, q: "زاویه بین عقربه‌ها در ساعت ۶ دقیقاً ۱۸۰ درجه است.", a: "درست" }
+                ],
+                blank: [
+                    { id: 181, q: "حاصل نصف به علاوه یک چهارم به علاوه یک هشتم به علاوه تا بی‌نهایت به عدد چند نزدیک می‌شود؟", a: ["۱", "1", "یک"] },
+                    { id: 182, q: "کوچکترین عددی که با ضرب در ۱۲۰ مربع کامل شود عدد چند است؟", a: ["۳۰", "30"] },
+                    { id: 183, q: "تعداد صفرهای انتهای حاصل‌ضرب ۱ تا ۲۰ برابر با چند است؟", a: ["۴", "4"] },
+                    { id: 184, q: "مکملِ متممِ متمم زاویه ۵۰ درجه برابر با چند درجه است؟", a: ["۱۳۰", "130"] },
+                    { id: 187, q: "تعداد شمارنده‌های عدد ۳۶ برابر با چند است؟", a: ["۹", "9"] },
+                    { id: 188, q: "اگر مساحت جانبی مکعب ۶۴ باشد، ضلع آن چند است؟", a: ["۴", "4"] },
+                    { id: 190, q: "جمله صدم الگوی مجذور چند منهای ۱ برابر با چند است؟", a: ["۹۹۹۹", "9999"] },
+                    { id: 191, q: "مجموع زوایای داخلی ۱۰ ضلعی چند درجه است؟", a: ["۱۴۴۰", "1440"] },
+                    { id: 192, q: "رقم یکان ۳ به توان ۴۰ برابر با چند است؟", a: ["۱", "1"] },
+                    { id: 193, q: "تعداد قطرهای ۱۰۰ ضلعی برابر با چند است؟", a: ["۴۸۵۰", "4850"] },
+                    { id: 195, q: "مجموع اعداد ۱ تا ۵۰ برابر با چند است؟", a: ["۱۲۷۵", "1275"] },
+                    { id: 197, q: "حاصل منفی ۱ به توان ۱۰۰ برابر با چند است؟", a: ["۱", "1"] }
+                ],
+                essay: [
+                    { id: 199, q: "گاوها و مرغ‌ها ۴۰ سر و ۱۱۰ پا دارند، تعداد هر کدام چند است؟", a: "" },
+                    { id: 200, q: "ساعتی هر ۲۴ ساعت ۳ دقیقه جلو می‌افتد، کی دوباره دقیق می‌شود؟", a: "" },
+                    { id: 203, q: "مکعب ۳ در ۳ در ۳ رنگ شده، چند مکعب کوچک اصلاً رنگ ندارند؟", a: "" },
+                    { id: 204, q: "مساحت بین ۴ دایره مماس به شعاع ۱۰ که مرکزشان مربع است چقدر است؟", a: "" },
+                    { id: 205, q: "دو دونده با تایم ۶۰ و ۸۰ ثانیه، پس از چند دقیقه به هم می‌رسند؟", a: "" },
+                    { id: 211, q: "مجموع اعداد ۱ تا ۱۰۰ را به روش گاوس حساب کن.", a: "" },
+                    { id: 212, q: "مکعبی به ضلع ۵ سانتی‌متر، سطح کل آن چقدر است؟", a: "" },
+                    { id: 213, q: "بزرگترین عدد اول دو رقمی را با دلیل پیدا کن.", a: "" },
+                    { id: 216, q: "مساحت قسمت رنگی: دایره‌ای در مربع به ضلع ۱۰ که دایره مماس بر اضلاع است.", a: "" }
+                ]
+            }
+        };
+
+        // متغیرهای سراسری
+        let currentSettings = {};
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
+        let askedQuestionIds = [];
+        let userAnswer = null;
+        let currentQuestionType = '';
+        let answerSubmitted = false;
+
+        // شروع آزمون
+        function startQuiz() {
+            const grade = document.getElementById('grade-select').value;
+            const subject = document.getElementById('subject-select').value;
+            const questionType = document.querySelector('input[name="question-type"]:checked').value;
+            const difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+            const count = parseInt(document.getElementById('question-count').value);
+
+            currentSettings = { grade, subject, questionType, difficulty, count };
+            currentQuestionType = questionType;
+
+            const availableQuestions = questionsDatabase[difficulty][questionType];
+            currentQuestions = shuffleArray([...availableQuestions]).slice(0, count);
+            
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            askedQuestionIds = [];
+            answerSubmitted = false;
+
+            document.getElementById('settings-page').style.display = 'none';
+            document.getElementById('question-page').style.display = 'block';
+
+            showQuestion();
+        }
+
+        // نمایش سوال
+        function showQuestion() {
+            const question = currentQuestions[currentQuestionIndex];
+            askedQuestionIds.push(question.id);
+            answerSubmitted = false;
+
+            document.getElementById('question-counter').textContent = 
+                `سوال ${currentQuestionIndex + 1} از ${currentQuestions.length}`;
+
+            const progress = ((currentQuestionIndex) / currentQuestions.length) * 100;
+            const progressBar = document.getElementById('progress-fill');
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = Math.round(progress) + '%';
+
+            document.getElementById('question-text').textContent = question.q;
+            document.getElementById('result-message').innerHTML = '';
+            document.getElementById('correct-answer').innerHTML = '';
+
+            userAnswer = null;
+
+            document.getElementById('test-options').style.display = 'none';
+            document.getElementById('tf-options').style.display = 'none';
+            document.getElementById('answer-input').style.display = 'none';
+
+            // ریست دکمه‌ها
+            const buttonGroup = document.getElementById('button-group');
+            buttonGroup.innerHTML = '<button id="submit-btn" onclick="submitAnswer()">اتمام ✓</button>';
+
+            if (currentQuestionType === 'test') {
+                showTestOptions(question);
+            } else if (currentQuestionType === 'truefalse') {
+                showTrueFalseOptions();
+            } else {
+                showTextInput();
+            }
+        }
+
+        // نمایش گزینه‌های تستی
+        function showTestOptions(question) {
+            const container = document.getElementById('test-options');
+            container.innerHTML = '';
+            container.style.display = 'flex';
+
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => selectTestOption(option, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        // انتخاب گزینه تستی
+        function selectTestOption(answer, btnElement) {
+            if (answerSubmitted) return;
+            
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            btnElement.classList.add('selected');
+            userAnswer = answer;
+        }
+
+        // نمایش گزینه‌های درست/نادرست
+        function showTrueFalseOptions() {
+            document.getElementById('tf-options').style.display = 'flex';
+            document.querySelectorAll('.true-false-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        }
+
+        // انتخاب درست/نادرست
+        function selectTrueFalse(answer) {
+            if (answerSubmitted) return;
+            
+            document.querySelectorAll('.true-false-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            event.target.classList.add('selected');
+            userAnswer = answer;
+        }
+
+        // نمایش ورودی متنی
+        function showTextInput() {
+            const input = document.getElementById('answer-input');
+            input.style.display = 'block';
+            input.value = '';
+            input.disabled = false;
+        }
+
+        // بررسی پاسخ
+        function submitAnswer() {
+            if (answerSubmitted) return;
+            
+            const question = currentQuestions[currentQuestionIndex];
+            
+            if (currentQuestionType === 'blank' || currentQuestionType === 'essay') {
+                userAnswer = document.getElementById('answer-input').value.trim();
+            }
+
+            if (!userAnswer || userAnswer === '') {
+                alert('لطفاً پاسخ خود را وارد کنید!');
+                return;
+            }
+
+            answerSubmitted = true;
+            let isCorrect = false;
+            const resultDiv = document.getElementById('result-message');
+            const correctAnswerDiv = document.getElementById('correct-answer');
+
+            if (currentQuestionType === 'essay') {
+                isCorrect = true;
+                correctAnswers++;
+                resultDiv.innerHTML = '<div class="result-message correct">آفرین! درست گفتی! 🎉</div>';
+            } else {
+                if (Array.isArray(question.a)) {
+                    isCorrect = question.a.some(ans => 
+                        normalizeAnswer(userAnswer) === normalizeAnswer(ans)
+                    );
+                } else {
+                    isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(question.a);
+                }
+
+                if (isCorrect) {
+                    correctAnswers++;
+                    resultDiv.innerHTML = '<div class="result-message correct">آفرین! درست گفتی! 🎉</div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="result-message incorrect">اشتباه! اشکال ندارد، یک بار دیگر تلاش کن 💪</div>';
+                    
+                    // نمایش جواب درست
+                    let correctAnswerText = Array.isArray(question.a) ? question.a[0] : question.a;
+                    correctAnswerDiv.innerHTML = `<div class="correct-answer-display">جواب درست: ${correctAnswerText}</div>`;
+                }
+            }
+
+            // غیرفعال کردن ورودی‌ها
+            if (currentQuestionType === 'blank' || currentQuestionType === 'essay') {
+                document.getElementById('answer-input').disabled = true;
+            }
+            document.querySelectorAll('.option-btn, .true-false-btn').forEach(btn => {
+                btn.style.pointerEvents = 'none';
+            });
+
+            // تغییر دکمه‌ها
+            const buttonGroup = document.getElementById('button-group');
+            
+            if (currentQuestionIndex === currentQuestions.length - 1) {
+                // آخرین سوال
+                buttonGroup.innerHTML = '<button onclick="showFinalScore()">بازگشت به صفحه اصلی 🏠</button>';
+            } else {
+                // سوالات میانی
+                buttonGroup.innerHTML = '<button onclick="nextQuestion()">سوال بعدی ➡️</button>';
+            }
+        }
+
+        // سوال بعدی
+        function nextQuestion() {
+            currentQuestionIndex++;
+            showQuestion();
+        }
+
+        // نمایش نمره نهایی
+        function showFinalScore() {
+            document.getElementById('question-page').style.display = 'none';
+            document.getElementById('score-page').style.display = 'block';
+
+            const scoreText = `${correctAnswers} از ${currentQuestions.length}`;
+            document.getElementById('final-score').textContent = scoreText;
+
+            const percentage = (correctAnswers / currentQuestions.length) * 100;
+            let message = '';
+
+            if (percentage === 100) {
+                message = 'عالی! همه را درست جواب دادی! 🏆';
+            } else if (percentage >= 80) {
+                message = 'خیلی خوب! کارت عالی بود! 🌟';
+            } else if (percentage >= 60) {
+                message = 'خوب است! می‌تونی بهتر شی! 👍';
+            } else {
+                message = 'نیاز به تمرین بیشتر داری! تلاش کن! 💪';
+            }
+
+            document.getElementById('score-message').textContent = message;
+        }
+
+        // بازگشت به صفحه اصلی
+        function resetQuiz() {
+            document.getElementById('score-page').style.display = 'none';
+            document.getElementById('settings-page').style.display = 'block';
+
+            currentQuestions = [];
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            askedQuestionIds = [];
+            userAnswer = null;
+            answerSubmitted = false;
+        }
+
+        // توابع کمکی
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function normalizeAnswer(answer) {
+            if (typeof answer !== 'string') return '';
+            return answer.trim().replace(/\s+/g, ' ').toLowerCase();
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> آزمون ریاضی</title>
     <style>
         * {
